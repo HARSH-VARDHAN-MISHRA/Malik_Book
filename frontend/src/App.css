@@ -1,0 +1,151 @@
+/* ======== Overlay =====  */
+
+input[type="checkbox"] {
+    cursor: pointer;
+  
+}
+
+strong {
+    font-weight: 600 !important;
+}
+
+.faded-red {
+    background-color: rgba(255, 0, 0, 0.075) !important;
+}
+
+.form-div {
+    max-height: 84vh;
+    overflow: auto;
+}
+
+.badge-draft {
+    background-color: #6c757d;
+    color: #212529;
+}
+
+.badge-active {
+    background-color: #28a745;
+    /* Green for active */
+    color: #fff;
+}
+
+.badge-other {
+    background-color: #6c757d;
+    /* Gray for other statuses */
+    color: #fff;
+}
+
+
+@media only screen and (min-width: 900px) {
+    .mobile-overlay-only.sidebar-overlay.open {
+        display: none;
+    }
+
+}
+
+
+
+/* Overlay Styles */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 10;
+    transition: all 300ms ease-in;
+}
+
+/* Show sidebar-overlay When Sidebar is Open */
+.sidebar-overlay.open {
+    display: block;
+}
+
+.sidebar-overlay {
+    transition: opacity 300ms ease-in;
+}
+
+
+.sidebar-overlay.open {
+    cursor: pointer;
+}
+
+
+
+
+/* ===== Filter Selection Modal =====  */
+
+.filter-modal {
+    position: absolute;
+    top: 100%;
+    margin-top: 6px;
+    margin-left: -5px;
+    border-radius: 5px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 5;
+    /* width: 200px; */
+    text-align: start;
+}
+
+.filter-modal input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* ===== Filter =====  */
+
+.filter-modal .filter-options,
+.filter-options {
+    background: whitesmoke;
+    border-radius: 4px;
+    padding: 0.5rem;
+    max-height: 180px;
+    overflow: auto;
+    min-width: 170px;
+}
+
+.filter-modal .filter-options label,
+.filter-options label {
+    font-size: 0.9rem;
+
+}
+
+.table-column-selection h5,
+.filter-modal h5 {
+    font-size: 1rem;
+}
+
+
+
+
+
+
+
+
+/* === Accordion ===  */
+.accordion-button:not(.collapsed) {
+    color: inherit !important;
+    background-color: #f9f9f9 !important;
+}
+
+.accordion-button:focus {
+    /* box-shadow: 0 0 0 0.25rem rgb(185 189 196 / 25%) !important;  */
+    box-shadow: none !important;
+}
+
+
+
+/* ======= Delivery status labels ==============  */
+.bg-blue{
+    background-color: #0066ff36 !important;
+    color: #2079ff !important;
+}
+
+.bg-golden{
+    background-color: #ffe8aa9a !important;
+    color: #b89601 !important;
+}
+

@@ -29,7 +29,18 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://192.168.1.61:3000",
+#     "http://localhost:3000",  
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Temporarily allow all origins
+CORS_ALLOW_CREDENTIALS = True
+
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
