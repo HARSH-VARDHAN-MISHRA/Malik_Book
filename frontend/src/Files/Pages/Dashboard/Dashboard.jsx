@@ -3,6 +3,9 @@ import userImage from '../../Assets/images/user.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from "react-router-dom";
 import './Dashboard.css'
+import { GET_ALL_SHOPS } from "../../../api";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [username, setUsername] = useState("");
@@ -39,6 +42,35 @@ const Dashboard = () => {
   ];
 
 
+  const [shopLoading,setShopLoading] = useState(false);
+
+  const getAllShops = () => {
+    setShopLoading(true);
+    // axios.get(GET_ALL_SHOPS)
+    axios.get(GET_ALL_SHOPS, { withCredentials: true })
+      .then((response) => {
+        console.log("Response:", response);
+
+        if (response.data.status === 1) {
+          console.log(response.data);
+        } else {
+          toast.error(response.data?.message || "Something went wrong!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error while fetching shops:", error);
+        toast.error(error?.response?.data?.message || "Something went wrong!");
+      })
+      .finally(() => {
+        setShopLoading(false);
+      });
+  };
+
+
+  useEffect(()=>{
+    getAllShops();
+  },[]);
+
 
 
   return (
@@ -46,7 +78,7 @@ const Dashboard = () => {
 
       <div className="container-fluid">
 
-        <div className="row bg-white p-3 mb-4">
+        {/* <div className="row bg-white p-3 mb-4">
           <div className="d-flex align-items-center gap-3">
             <img height={80} src={userImage} alt="USER IMAGE" />
             <div>
@@ -54,7 +86,7 @@ const Dashboard = () => {
               <p>Welcome to Admin Dashboard</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
 
         <div className="row">
@@ -89,18 +121,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-
-         
-
-          
-
         </div>
-
-
-
-
-
-
 
       </div>
     </>

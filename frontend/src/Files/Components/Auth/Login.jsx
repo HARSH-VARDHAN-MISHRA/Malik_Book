@@ -34,7 +34,9 @@ function Login() {
 
     
         try {
-            const response = await axios.post(LOGIN, sendData);
+            // const response = await axios.post(LOGIN, sendData);
+            const response = await axios.post(LOGIN, sendData, { withCredentials: true });
+
             console.log("Response:", response);
     
             if (response.data.status === 1) {

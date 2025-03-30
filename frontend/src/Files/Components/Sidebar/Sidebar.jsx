@@ -61,9 +61,9 @@ function Sidebar({ sidetoggle, onToggle }) {
             </div>
           </div>
           <div className="left">
-            
-            
-          <div className="btn-group">
+
+
+            <div className="btn-group">
               <button className="btn btn-primary btn-sm" type="button">
                 <i className="fa-solid fa-user"></i>{" "}
                 {userDetails?.username || "SignIn"}
@@ -116,9 +116,8 @@ function Sidebar({ sidetoggle, onToggle }) {
                   <span>{item.title}</span>
                   {item.subItems && (
                     <i
-                      className={`fa-solid fa-chevron-${
-                        dropdowns.includes(index) ? "up" : "down"
-                      }`}
+                      className={`fa-solid fa-chevron-${dropdowns.includes(index) ? "up" : "down"
+                        }`}
                     ></i>
                   )}
                 </Link>
@@ -138,9 +137,8 @@ function Sidebar({ sidetoggle, onToggle }) {
       </div>
 
       <div
-        className={` mobile-overlay-only sidebar-overlay ${
-          sidetoggle ? "open" : ""
-        }`}
+        className={` mobile-overlay-only sidebar-overlay ${sidetoggle ? "open" : ""
+          }`}
         onClick={onToggle}
       ></div>
     </>

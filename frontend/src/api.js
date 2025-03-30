@@ -11,3 +11,6 @@ export const LOGIN = `${PREFIX_URL}/login/`;
 // Products
 export const FETCH_ALL_PRODUCTS = `${PREFIX_URL}/get-products/`;
 
+// Shops
+export const GET_ALL_SHOPS = `${PREFIX_URL}/get-all-shops/`;
+

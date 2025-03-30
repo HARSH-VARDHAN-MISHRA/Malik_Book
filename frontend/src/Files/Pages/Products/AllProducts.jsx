@@ -57,16 +57,6 @@ function AllProducts() {
       search: query,
       page_number: page,
       page_size: 25,
-      selectedBrands: [], // it should be a list like =>  ["TEL","Garrett"]
-      selectedTypes: [], //  it should be a list like => ["INDICATORS","TURBOCHARGER"]
-      selectedStocks: [], //  it should be a list like =>  [2,0]
-      selectedkStocks: [], //  it should be a list like =>  [2,0]
-      selectedStatus: [], //  it should be a list like =>  ["active","Draft","error"]
-      row_checked_status: "", //  it should be a string like =>  "check","uncheck"
-      row_picture_checked_status: "", // it should be a string like =>  "check","uncheck",
-      png_picture_checked_status: "", //it should be a string like =>  "check","uncheck"
-      shopify_upload_checked_status: "", // it should be a string like =>  "check","uncheck"
-      youtube_upload_checked_status: "", // it should be a string like =>  "check","uncheck"
     };
     const headers = {
       "Content-Type": "application/json",
