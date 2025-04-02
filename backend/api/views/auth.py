@@ -9,6 +9,7 @@ def token_validator(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):    
         try:
+
             token = request.headers.get('Authorization', None)
             if not token:
                 token = request.COOKIES.get('token', None)
@@ -17,13 +18,8 @@ def token_validator(view_func):
             current_token=UserToken.objects.filter(token=token).last()
             if not current_token:
                 return Response({"status": 0, "message": "Invalid or Expired Token"}, status=status.HTTP_401_UNAUTHORIZED)
-            # user_data={
-            #     "id":current_token.user.pk,
-            #     "name":current_token.user.name,
-            #     "email":current_token.user.email,
-            #     "role":current_token.user.role,
-                
-            # }
+            if current_token.user.is_active==False:
+                return Response({"status": 0, "message": "Your account is inactive"}, status=status.HTTP_401_UNAUTHORIZED)
             request.current_user=current_token.user
             return view_func(request, *args, **kwargs)
         except Exception as e:
@@ -56,7 +52,7 @@ def login(request):
             return Response({"status":0,'message':"Your account is inactive"},status=status.HTTP_400_BAD_REQUEST)
         cur_token=UserToken.objects.filter(user=current_user).last()
         if not cur_token:
-            geted_token =get_unique_token(current_user)
+            geted_token=get_unique_token(current_user)
             cur_token=UserToken(user=current_user,token=geted_token)
             cur_token.save()
         detail={
@@ -69,8 +65,26 @@ def login(request):
 
         response=Response({"status": 1, 'message': 'logged in success',"data":detail}, status=status.HTTP_200_OK)
         years = 1 * 365 * 24 * 60 * 60 
-        response.set_cookie("token", cur_token.token, httponly=True,max_age=years)
+        response.set_cookie("token", cur_token.token, httponly=True,max_age=years,samesite="Lax",secure=False)
         return response
     except Exception as e:
-        print(e,'is exception')
+        # print(e,'is exception')
         return Response({"status":0,"message":"something went wrong"},status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+def check_token_validity(request):
+    try:
+        token=request.headers.get('Authorization', None)
+        if not token:
+            token = request.COOKIES.get('token', None)
+        if token and " " in token:
+            token=token.split(' ')[1]
+        current_token=UserToken.objects.filter(token=token).last()
+        if not current_token:
+            return Response({"status": 0, "message": "Invalid or Expired Token"}, status=status.HTTP_401_UNAUTHORIZED)
+        if current_token.user.is_active==False:
+            return Response({"status": 0, "message": "Your account is inactive"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"status": 1, "message": "Token is valid"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status": 0, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

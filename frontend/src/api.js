@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://192.168.1.61:8002';
+export const BASE_URL = 'http://192.168.1.30:8001';
 export const PREFIX_URL = `${BASE_URL}/api`;
 
 // API KEY
