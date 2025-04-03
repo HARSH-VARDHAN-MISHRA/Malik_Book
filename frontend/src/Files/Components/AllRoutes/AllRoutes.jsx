@@ -7,10 +7,12 @@ import AllProducts from "../../Pages/Products/AllProducts";
 import Login from "../Auth/Login";
 import TokenVerification from "../Auth/TokenVerification";
 import AddProduct from "../../Pages/Products/AddProduct";
+import AllCustomer from "../../Pages/Customer/AllCustomer";
+import ShopDetail from "../../Pages/Shop/ShopDetail";
 
 function AllRoutes() {
   const [sidetoggle, setSideToggle] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // null means not checked yet
+  const [isLoggedIn, setIsLoggedIn] = useState(null); // null means not checked yet
 
   const handleSidebarToggle = () => {
     setSideToggle(!sidetoggle);
@@ -18,7 +20,7 @@ function AllRoutes() {
 
   return (
     <>
-      {/* <TokenVerification setIsLoggedIn={setIsLoggedIn} /> */}
+      <TokenVerification setIsLoggedIn={setIsLoggedIn} />
 
       {isLoggedIn === null ? (
         <p>Loading...</p>
@@ -79,6 +81,37 @@ function AllRoutes() {
                   </>
                 }
               />
+
+
+              {/* ===== Customers ====  */}
+              <Route
+                path="/all-customers"
+                element={
+                  <>
+                    <Helmet>
+                      <title>All Customers - Account Mangement</title>{" "}
+                    </Helmet>
+                    <AllCustomer />
+                  </>
+                }
+              />
+
+
+              {/* ===== Customers ====  */}
+              <Route
+                path="/shop-details/:id"
+                element={
+                  <>
+                    <Helmet>
+                      <title>Shop Detail - Account Mangement</title>{" "}
+                    </Helmet>
+                    <ShopDetail />
+                  </>
+                }
+              />
+
+
+
               <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
           </div>

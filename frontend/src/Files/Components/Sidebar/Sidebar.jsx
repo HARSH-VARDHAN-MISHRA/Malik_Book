@@ -32,6 +32,11 @@ function Sidebar({ sidetoggle, onToggle }) {
         { path: "/unallocated-products", label: "Unallocated Products" },
       ],
     },
+    {
+      title: "Customers",
+      path: "/all-customers/",
+      icon: <i className="fa-solid fa-users"></i>,
+    },
   ];
 
   //Navbar
@@ -45,7 +50,7 @@ function Sidebar({ sidetoggle, onToggle }) {
 
   const handleLogout = () => {
     // Clear user data from localStorage
-    localStorage.removeItem("partsklik_crm_user");
+    localStorage.removeItem("malik_book_user");
 
     // Redirect to the login page
     window.location.href = "/login";
@@ -65,8 +70,7 @@ function Sidebar({ sidetoggle, onToggle }) {
 
             <div className="btn-group">
               <button className="btn btn-primary btn-sm" type="button">
-                <i className="fa-solid fa-user"></i>{" "}
-                {userDetails?.username || "SignIn"}
+                {userDetails?.name || "SignIn"}
               </button>
               <button
                 type="button"

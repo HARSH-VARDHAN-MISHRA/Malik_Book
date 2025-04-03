@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { APIKEY, CHECK_TOKEN_VALIDITY } from "../../../api";
+import {  CHECK_TOKEN_VALIDITY } from "../../../api";
 
 function TokenVerification({ setIsLoggedIn }) {
     const navigate = useNavigate();
@@ -11,13 +11,13 @@ function TokenVerification({ setIsLoggedIn }) {
     
             let userDetails;
             try {
-                userDetails = JSON.parse(localStorage.getItem("partsklik_crm_user"));
+                userDetails = JSON.parse(localStorage.getItem("malik_book_user"));
             } catch {
                 userDetails = null;
             }
     
-            if (!userDetails || !userDetails.token || !userDetails.user_id || !userDetails.user_role || !userDetails.username) {
-                // console.log("Invalid user details");
+            if (!userDetails || !userDetails.token || !userDetails.id || !userDetails.role || !userDetails.name) {
+                
                 if (setIsLoggedIn) setIsLoggedIn(false);
                 navigate("/login");
                 return;
@@ -25,21 +25,15 @@ function TokenVerification({ setIsLoggedIn }) {
     
             try {
                 const headers = {
-                    "content-type": "application/json",
-                    "API-Key": APIKEY,
+                    "Content-Type": "application/json",
+                    // "Authorization": `Bearer ${userDetails.token}`, 
+                    "Authorization": `Barear ${userDetails.token}`, 
                 };
-    
-                const payload = {
-                    user_id: userDetails.user_id,
-                    token: userDetails.token,
-                };
-    
-                const response = await axios.post(CHECK_TOKEN_VALIDITY, payload, {
-                    headers,
-                });
+                // console.log("userDetails.token : ",userDetails.token);
+                const response = await axios.post(CHECK_TOKEN_VALIDITY, {}, { headers });
     
                 if (response.data.status === 0) {
-                    // console.log("Token invalid");
+                    console.log("Token invalid");
                     if (setIsLoggedIn) setIsLoggedIn(false);
                     navigate("/login");
                 } else {

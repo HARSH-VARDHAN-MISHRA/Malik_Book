@@ -49,7 +49,7 @@ function Login() {
                 };
                 localStorage.setItem("malik_book_user", JSON.stringify(userDetails));
                 toast.success("Logged In Successfully!");
-                navigate("/dashboard");
+                navigate("/dashboard/");
             } else {
                 toast.error(response.data?.message || "Login failed!");
             }

@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
 import userImage from '../../Assets/images/user.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './Dashboard.css'
 import { GET_ALL_SHOPS } from "../../../api";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 const Dashboard = () => {
+
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [greeting, setGreeting] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const user = JSON.parse(localStorage.getItem("malik_book_user"));
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("malik_book_user"));
     if (user && user.username) {
       setUsername(user.username);
     }
     if (user && user?.role.toLowerCase() === "admin") {
       setIsAdmin(true);
+      getAllShops();
     }
 
     const getGreeting = () => {
@@ -42,17 +45,23 @@ const Dashboard = () => {
   ];
 
 
-  const [shopLoading,setShopLoading] = useState(false);
+  const [shopLoading, setShopLoading] = useState(false);
+  const [shops, setShops] = useState([]);
 
   const getAllShops = () => {
     setShopLoading(true);
-    // axios.get(GET_ALL_SHOPS)
-    axios.get(GET_ALL_SHOPS, { withCredentials: true })
+
+    const headers = {
+      Authorization: `${user.token}`,
+    };
+
+
+    axios.get(GET_ALL_SHOPS, { headers })
       .then((response) => {
-        console.log("Response:", response);
 
         if (response.data.status === 1) {
           console.log(response.data);
+          setShops(response.data.data);
         } else {
           toast.error(response.data?.message || "Something went wrong!");
         }
@@ -67,9 +76,7 @@ const Dashboard = () => {
   };
 
 
-  useEffect(()=>{
-    getAllShops();
-  },[]);
+
 
 
 
@@ -88,13 +95,11 @@ const Dashboard = () => {
           </div>
         </div> */}
 
-
-        <div className="row">
-          <div className="col-xl-12 dashboard">
+        {/* <div className="col-xl-12 dashboard">
 
             <div className="row">
               {dummyData.map((item, index) => (
-                <div className="col-xxl-3 col-xl-6" key={index}>
+                <div className="col-xxl-3 col-xl-6 col-md-6" key={index}>
                   <div className="card custom-card position-relative rounded mb-2">
                     <div className="card-body p-3 dash-bg-image">
                       <div className="d-flex align-items-start justify-content-between mb-2 gap-1 flex-xxl-nowrap flex-wrap">
@@ -119,6 +124,76 @@ const Dashboard = () => {
               ))}
 
             </div>
+          </div> */}
+
+        <div className="row">
+
+          {/* All Shops */}
+
+          <div className="col-md-12">
+
+            {shopLoading ? (
+              <div className="text-center">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : (
+              <div className="row">
+                {shops.map((shop) => (
+                  <div className="col-md-4 mb-4" key={shop.id}>
+                    <div className="card shadow-sm h-100">
+                      <div className="card-body">
+                        <h5 className="card-title">{shop.name}</h5>
+                        <p className="card-text">
+                          <strong>Address:</strong> {shop.address} <br />
+                          <strong>Contact:</strong> {shop.contact_number || "N/A"} <br />
+                        </p>
+
+                        {/* Display Bank Balances */}
+                        <h6 className="mt-3">Bank Balances:</h6>
+                        {shop.current_balance.bank_balance.length > 0 ? (
+                          <ul className="list-group mb-2">
+                            {shop.current_balance.bank_balance.map((bank) => (
+                              <li className="list-group-item d-flex justify-content-between" key={bank.id}>
+                                <span>{bank.bank_name}</span>
+                                <strong>₹{bank.balance.toLocaleString()}</strong>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-muted">No bank balance available.</p>
+                        )}
+
+                        {/* Display Cash Balances */}
+                        <h6>Cash Balances:</h6>
+                        {shop.current_balance.cash.length > 0 ? (
+                          <ul className="list-group mb-3">
+                            {shop.current_balance.cash.map((cash) => (
+                              <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                <span>₹{cash.currency} x {cash.quantity}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-muted">No cash available.</p>
+                        )}
+
+                        {/* Navigate to Shop Details Page */}
+                        <button
+                          className="btn btn-primary w-100"
+                          onClick={() => navigate(`/shop-details/${shop.id}`)}
+                        >
+                          <i className="fa-solid fa-arrow-right"></i> View Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+
           </div>
 
         </div>
