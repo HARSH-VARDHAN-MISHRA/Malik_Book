@@ -61,23 +61,23 @@ class AdminDailyBalance(admin.ModelAdmin):
 
 @admin.register(DailyOpeningCashBalance)
 class AdminDailyOpeningCashBalance(admin.ModelAdmin):
-    list_display = ('id','daily_balance__date','currency','quantity')
-    search_fields = ['id','daily_balance__date','currency','quantity']
+    list_display = ('id','currency','quantity')
+    search_fields = ['id','currency','quantity']
 
 @admin.register(DailyClosingCashBalance)
 class AdminDailyClosingCashBalance(admin.ModelAdmin):
-    list_display = ('id','daily_balance__date','currency','quantity')
-    search_fields = ['id','daily_balance__date','currency','quantity']
+    list_display = ('id','currency','quantity')
+    search_fields = ['id','currency','quantity']
 
 @admin.register(DailyOpeningBankBalance)
 class AdminDailyOpeningBankBalance(admin.ModelAdmin):
-    list_display = ('id','daily_balance__date','bank_account','amount')
-    search_fields = ['id','daily_balance__date','bank_account','amount']
+    list_display = ('id','bank_account','amount')
+    search_fields = ['id','bank_account','amount']
     
 @admin.register(DailyClosingBankBalance)
 class AdminDailyClosingBankBalance(admin.ModelAdmin):
-    list_display = ('id','daily_balance__date','bank_account','amount')
-    search_fields = ['id','daily_balance__date','bank_account','amount']
+    list_display = ('id','bank_account','amount')
+    search_fields = ['id','bank_account','amount']
 
 
 
