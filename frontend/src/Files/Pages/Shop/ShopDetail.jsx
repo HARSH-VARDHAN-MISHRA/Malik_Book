@@ -166,10 +166,11 @@ const ShopDetail = () => {
                             </div>
                         </div>
 
-
-                        <div className="col-md-9">
-                            <ShopTransations id={id} />
-                        </div>
+                        {shop && (
+                            <div className="col-md-9">
+                                <ShopTransations id={id} balance={shop.current_balance} />
+                            </div>
+                        )}
                     </div>
                 </section>
             )}

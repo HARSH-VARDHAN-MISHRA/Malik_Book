@@ -9,7 +9,7 @@ import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import PayPaymentModal from "../Transactions/PayPaymentModal";
 
-const ShopTransations = ({ id }) => {
+const ShopTransations = ({ id , balance }) => {
 
     const [loading, setLoading] = useState(true);
     const [transactions, setTransactions] = useState([]);
@@ -127,6 +127,7 @@ const ShopTransations = ({ id }) => {
                     open={openMakePaymentModal}
                     handleClose={handleCloseMakePaymentModal}
                     shopPk={id}
+                    balance={balance}
                 />
             )}
 
