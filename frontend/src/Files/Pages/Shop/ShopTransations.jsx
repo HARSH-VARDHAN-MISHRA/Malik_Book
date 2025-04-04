@@ -8,8 +8,9 @@ import FilterDateRangeModal from "../../Components/FilterModals/FilterDateRangeM
 import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import PayPaymentModal from "../Transactions/PayPaymentModal";
+import ReceivePaymentModal from "../Transactions/ReceivePaymentModal";
 
-const ShopTransations = ({ id , balance }) => {
+const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
     const [loading, setLoading] = useState(true);
     const [transactions, setTransactions] = useState([]);
@@ -117,10 +118,21 @@ const ShopTransations = ({ id , balance }) => {
         setOpenMakePaymentModal(false);
         fetchData()
     };
+
+    // Receive Payment Modal
+    const [openReceivePaymentModal, setOpenReceivePaymentModal] = useState(false);
+    const handleOpenReceivePaymentModal = () => {
+        setOpenReceivePaymentModal(true);
+    };
+
+    const handleCloseReceivePaymentModal = () => {
+        setOpenReceivePaymentModal(false);
+        fetchData()
+    };
+
     return (
         <>
             {loading && <Loader />}
-
 
             {openMakePaymentModal && (
                 <PayPaymentModal
@@ -128,6 +140,18 @@ const ShopTransations = ({ id , balance }) => {
                     handleClose={handleCloseMakePaymentModal}
                     shopPk={id}
                     balance={balance}
+                    fetchShopDetail={fetchShopDetail}
+                    fetchData={fetchData}
+                />
+            )}
+            {openReceivePaymentModal && (
+                <ReceivePaymentModal
+                    open={openReceivePaymentModal}
+                    handleClose={handleCloseReceivePaymentModal}
+                    shopPk={id}
+                    balance={balance}
+                    fetchShopDetail={fetchShopDetail}
+                    fetchData={fetchData}
                 />
             )}
 
@@ -149,13 +173,15 @@ const ShopTransations = ({ id , balance }) => {
                         </div>
                     </div>
                     <div className="col-xl-8 ">
-                        <div className="top-content-btns">
+                        <div className="top-content-btns mt-1 mt-md-0">
                             <button className="btn btn-secondary"
                                 onClick={() => handleOpenMakePaymentModal()}
                             >
                                 Make Payment
                             </button>
-                            <button className="btn btn-success">
+                            <button className="btn btn-success"
+                                onClick={() => handleOpenReceivePaymentModal()}
+                            >
                                 Receive Payment
                             </button>
                         </div>
@@ -221,17 +247,22 @@ const ShopTransations = ({ id , balance }) => {
                                 return (
                                     <tr key={txn.id}>
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                                        <td>{txn.date}</td>
+                                        <td className="text-nowrap">{txn.date}</td>
                                         <td>
                                             <strong>{txn.customer?.name || "-"}</strong>
                                             <br />
                                             {txn.customer?.phone}
                                         </td>
-                                        <td>{txn.transaction_type}</td>
-                                        <td>{totalCash ? `₹ ${totalCash}` : '-'}</td>
-                                        <td>{totalBank ? `₹ ${totalBank}` : '-'}</td>
+                                        <td className="text-center">
+                                            <span className={`badge ${txn.transaction_type === 'Pay' ? 'bg-danger' : 'bg-success'}`}>
+                                                {txn.transaction_type}
+                                            </span>
+                                        </td>
+
+                                        <td className="text-nowrap">{totalCash ? `₹ ${totalCash}` : '-'}</td>
+                                        <td className="text-nowrap">{totalBank ? `₹ ${totalBank}` : '-'}</td>
                                         <td>{txn.remark || "-"}</td>
-                                        <td>
+                                        <td className="text-nowrap">
                                             {new Date(txn.created_at).toLocaleString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',

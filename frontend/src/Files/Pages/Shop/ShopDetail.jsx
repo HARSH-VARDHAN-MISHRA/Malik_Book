@@ -33,7 +33,7 @@ const ShopDetail = () => {
             .get(`${GET_SHOP_DETAIL}`, { params, headers })
             .then((response) => {
                 if (response.data.status === 1) {
-                    console.log(response.data.data);
+                    // console.log(response.data.data);
                     setShop(response.data.data);
                 } else {
                     toast.error(response.data.message || "Failed to fetch shop details");
@@ -83,7 +83,7 @@ const ShopDetail = () => {
                     <div className="row">
                         {/* Left Section: Shop Details */}
                         <div className="col-md-3">
-                            <div className="card">
+                            <div className="card" style={{maxHeight:"80vh",overflow:"auto"}}>
                                 <div className="card-body">
                                     <h5 className="card-title">{shop.name}</h5>
                                     <p className="card-text">
@@ -167,8 +167,8 @@ const ShopDetail = () => {
                         </div>
 
                         {shop && (
-                            <div className="col-md-9">
-                                <ShopTransations id={id} balance={shop.current_balance} />
+                            <div className="col-md-9 mt-4 mt-md-0">
+                                <ShopTransations id={id} balance={shop.current_balance} fetchShopDetail={fetchData} />
                             </div>
                         )}
                     </div>

@@ -17,13 +17,18 @@ const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("malik_book_user"));
 
   useEffect(() => {
-    if (user && user.username) {
+    if (user) {
       setUsername(user.username);
+
+      if (user.role?.toLowerCase() === "admin") {
+        setIsAdmin(true);
+        getAllShops();
+      } else {
+        navigate(`/shop-details/${user.shop_pk}`);
+      }
     }
-    if (user && user?.role.toLowerCase() === "admin") {
-      setIsAdmin(true);
-      getAllShops();
-    }
+
+    
 
     const getGreeting = () => {
       const hour = new Date().getHours();
@@ -234,14 +239,14 @@ const Dashboard = () => {
 
         {/* Shop Transations for users */}
 
-        {isAdmin ? null : (
+        {/* {isAdmin ? null : (
           <div className="row">
             <div className="col-md-12">
               <ShopTransations id={user.shop_pk} />
             </div>
           </div>
 
-        )}
+        )} */}
 
 
 

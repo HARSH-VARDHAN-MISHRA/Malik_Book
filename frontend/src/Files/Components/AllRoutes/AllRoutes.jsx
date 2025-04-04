@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Sidebar from "../Sidebar/Sidebar";
@@ -9,14 +9,20 @@ import TokenVerification from "../Auth/TokenVerification";
 import AddProduct from "../../Pages/Products/AddProduct";
 import AllCustomer from "../../Pages/Customer/AllCustomer";
 import ShopDetail from "../../Pages/Shop/ShopDetail";
+import { UseScreenWidth } from "../Utils/UseScreenWidth";
 
 function AllRoutes() {
-  const [sidetoggle, setSideToggle] = useState(true);
+  const isWideScreen = UseScreenWidth();
+  const [sidetoggle, setSideToggle] = useState(isWideScreen);
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null means not checked yet
 
   const handleSidebarToggle = () => {
     setSideToggle(!sidetoggle);
   };
+
+  useEffect(() => {
+    setSideToggle(isWideScreen);
+  }, [isWideScreen]);
 
   return (
     <>

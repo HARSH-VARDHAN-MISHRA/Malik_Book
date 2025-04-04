@@ -3,6 +3,7 @@ import logo from "../../Assets/images/logo.png";
 import "./Sidebar.css";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../../../api";
+import { UseScreenWidth } from "../Utils/UseScreenWidth";
 
 function Sidebar({ sidetoggle, onToggle }) {
   const [dropdowns, setDropdowns] = useState([]);
@@ -22,15 +23,6 @@ function Sidebar({ sidetoggle, onToggle }) {
       title: "Dashboard",
       path: "/dashboard",
       icon: <i className="fa-solid fa-gauge"></i>,
-    },
-    {
-      title: "Products",
-      icon: <i className="fa-solid fa-box"></i>,
-      subItems: [
-        { path: "/all-products", label: "All Products" },
-        { path: "/add-product", label: "Add Products" },
-        { path: "/unallocated-products", label: "Unallocated Products" },
-      ],
     },
     {
       title: "Customers",
@@ -55,6 +47,8 @@ function Sidebar({ sidetoggle, onToggle }) {
     // Redirect to the login page
     window.location.href = "/login";
   };
+
+  const isWideScreen = UseScreenWidth();
 
   return (
     <>
@@ -113,8 +107,15 @@ function Sidebar({ sidetoggle, onToggle }) {
             {initialMenuItems.map((item, index) => (
               <li key={index}>
                 <Link
-                  to={item.path || "#"}
-                  onClick={() => item.subItems && handleDropdownToggle(index)}
+                  to={item.path || "javascript:void(0)"}
+                  onClick={(e) => {
+                    if (item.subItems) {
+                      handleDropdownToggle(index);
+                    } else {
+                      if (!item.path) e.preventDefault(); // Prevent navigation if no path
+                      if (!isWideScreen) onToggle();
+                    }
+                  }}
                 >
                   {item.icon}
                   <span>{item.title}</span>
@@ -129,7 +130,7 @@ function Sidebar({ sidetoggle, onToggle }) {
                   <ul className="submenu">
                     {item.subItems.map((subItem, subIndex) => (
                       <li key={subIndex}>
-                        <Link to={subItem.path}>{subItem.label}</Link>
+                        <Link to={subItem.path} onClick={isWideScreen ? "" : onToggle} >{subItem.label}</Link>
                       </li>
                     ))}
                   </ul>
