@@ -60,7 +60,8 @@ def login(request):
             "name":current_user.name,
             "email":current_user.email,
             "token":cur_token.token,
-            "role":current_user.role
+            "role":current_user.role,
+            "shop_pk":current_user.shop.pk if current_user.shop else 0
         }
 
         response=Response({"status": 1, 'message': 'logged in success',"data":detail}, status=status.HTTP_200_OK)
