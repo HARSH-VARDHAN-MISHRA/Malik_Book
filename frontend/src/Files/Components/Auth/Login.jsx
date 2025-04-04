@@ -45,7 +45,8 @@ function Login() {
                     name: response.data.data.name,
                     email: response.data.data.email,
                     token: response.data.data.token,
-                    role: response.data.data.role
+                    role: response.data.data.role,
+                    shop_pk : response.data.data.shop_pk,
                 };
                 localStorage.setItem("malik_book_user", JSON.stringify(userDetails));
                 toast.success("Logged In Successfully!");

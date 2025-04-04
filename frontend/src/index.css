@@ -260,7 +260,7 @@ fieldset:disabled .btn {
 
  /* Modal Body  */
  .modal-body {
-  max-height: 80vh;
+  max-height: 75vh;
   overflow: auto;
 }
 

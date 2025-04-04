@@ -6,6 +6,7 @@ import './Dashboard.css'
 import { GET_ALL_SHOPS } from "../../../api";
 import axios from "axios";
 import toast from "react-hot-toast";
+import ShopTransations from "../Shop/ShopTransations";
 
 const Dashboard = () => {
 
@@ -126,8 +127,9 @@ const Dashboard = () => {
           </div>
         </div> */}
 
-        <div className="row">
 
+        {/* For ADMIN */}
+        <div className="row">
           {/* All Shops */}
 
           <div className="col-md-12">
@@ -226,8 +228,22 @@ const Dashboard = () => {
 
 
           </div>
-
         </div>
+
+
+
+        {/* Shop Transations for users */}
+
+        {isAdmin ? null : (
+          <div className="row">
+            <div className="col-md-12">
+              <ShopTransations id={user.shop_pk} />
+            </div>
+          </div>
+
+        )}
+
+
 
       </div>
     </>

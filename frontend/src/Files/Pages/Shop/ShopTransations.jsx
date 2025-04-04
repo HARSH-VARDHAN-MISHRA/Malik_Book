@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import FilterDateRangeModal from "../../Components/FilterModals/FilterDateRangeModal";
 import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
+import PayPaymentModal from "../Transactions/PayPaymentModal";
 
 const ShopTransations = ({ id }) => {
 
@@ -86,7 +87,7 @@ const ShopTransations = ({ id }) => {
         axios
             .post(GET_TRANSACTIONS, data, { headers })
             .then((response) => {
-                console.log(response.data.transactions);
+                // console.log(response.data.transactions);
                 setTransactions(response.data.transactions || []);
                 setTotalPages(response.data.total_pages);
                 setTotalRows(response.data.total_rows);
@@ -100,13 +101,35 @@ const ShopTransations = ({ id }) => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedTransactionType , id]);
+    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedTransactionType, id]);
 
+
+
+
+
+    // Make Payment Modal
+    const [openMakePaymentModal, setOpenMakePaymentModal] = useState(false);
+    const handleOpenMakePaymentModal = () => {
+        setOpenMakePaymentModal(true);
+    };
+
+    const handleCloseMakePaymentModal = () => {
+        setOpenMakePaymentModal(false);
+        fetchData()
+    };
     return (
         <>
-
-
             {loading && <Loader />}
+
+
+            {openMakePaymentModal && (
+                <PayPaymentModal
+                    open={openMakePaymentModal}
+                    handleClose={handleCloseMakePaymentModal}
+                    shopPk={id}
+                />
+            )}
+
 
             <div className="top-content mb-2">
                 <div className="row">
@@ -124,8 +147,17 @@ const ShopTransations = ({ id }) => {
                             />
                         </div>
                     </div>
-                    <div className="col-xl-8">
-
+                    <div className="col-xl-8 ">
+                        <div className="top-content-btns">
+                            <button className="btn btn-secondary"
+                                onClick={() => handleOpenMakePaymentModal()}
+                            >
+                                Make Payment
+                            </button>
+                            <button className="btn btn-success">
+                                Receive Payment
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
