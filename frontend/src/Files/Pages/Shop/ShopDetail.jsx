@@ -4,6 +4,7 @@ import axios from "axios";
 import { GET_SHOP_DETAIL } from "../../../api";
 import Loader from "../../Components/Loader/Loader";
 import toast from "react-hot-toast";
+import ShopTransations from "./ShopTransations";
 
 const ShopDetail = () => {
     const { id } = useParams(); // Extract the shop ID from URL
@@ -67,11 +68,11 @@ const ShopDetail = () => {
                         ></i>{" "}
                         <Link to={`/`}>Home</Link>
                     </li>
-                    <li className="breadcrumb-item">
-                        <Link to={`/all-shops`}>Shops</Link>
+                    <li className="breadcrumb-item active">
+                        Shop Detail
                     </li>
                     <li className="breadcrumb-item active" aria-current="page">
-                        <strong>(#{id})</strong>
+                        <strong>{shop?.name}</strong>
                     </li>
                 </ol>
             </nav>
@@ -91,81 +92,83 @@ const ShopDetail = () => {
                                     <p className="card-text">
                                         <strong>Contact:</strong> {shop.contact_number || "N/A"}
                                     </p>
+
+                                    {/* Bank Balances */}
+                                    <h6 className="mt-2">Bank Balances:</h6>
+                                    {shop.current_balance.bank_balance.length > 0 ? (
+                                        <ul className="list-group mb-2">
+                                            {shop.current_balance.bank_balance.map((bank) => (
+                                                <li className="list-group-item" key={bank.id}>
+                                                    <div className="fw-medium">{bank.bank_name}</div>
+                                                    <div className="small text-muted">
+                                                        A/C: {bank.account_number} <br />
+                                                        Name: {bank.account_name} <br />
+                                                        IFSC: {bank.ifsc_code}
+                                                    </div>
+                                                    <div className="d-flex justify-content-between mt-1">
+                                                        <span className="text-secondary">Balance:</span>
+                                                        <strong>₹{bank.balance.toLocaleString()}</strong>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                            <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                                <span>Total Bank Balance:</span>
+                                                <span>
+                                                    ₹
+                                                    {shop.current_balance.bank_balance
+                                                        .reduce((sum, bank) => sum + bank.balance, 0)
+                                                        .toLocaleString()}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    ) : (
+                                        <p className="text-muted">No bank balance available.</p>
+                                    )}
+
+                                    {/* Cash Balances */}
+                                    <h6>Cash Balances:</h6>
+                                    {shop.current_balance.cash.length > 0 ? (
+                                        <ul className="list-group mb-2">
+                                            {shop.current_balance.cash.map((cash) => (
+                                                <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                                    <span>
+                                                        ₹{cash.currency} x {cash.quantity}
+                                                    </span>
+                                                    <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
+                                                </li>
+                                            ))}
+                                            <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                                <span>Total Cash Balance:</span>
+                                                <span>
+                                                    ₹
+                                                    {shop.current_balance.cash
+                                                        .reduce((sum, cash) => sum + cash.currency * cash.quantity, 0)
+                                                        .toLocaleString()}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    ) : (
+                                        <p className="text-muted">No cash available.</p>
+                                    )}
+
+                                    {/* Grand Total */}
+                                    <li className=" d-flex justify-content-between fs-5 text-danger fw-medium  mt-2">
+                                        <span>Grand Total:</span>
+                                        <span>
+                                            ₹
+                                            {(
+                                                shop.current_balance.bank_balance.reduce((sum, bank) => sum + bank.balance, 0) +
+                                                shop.current_balance.cash.reduce((sum, cash) => sum + cash.currency * cash.quantity, 0)
+                                            ).toLocaleString()}
+                                        </span>
+                                    </li>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Section: Cash & Bank Balance */}
+
                         <div className="col-md-9">
-                            <div className="row">
-                                {/* Bank Balance Details */}
-                                <div className="col-md-12">
-                                    <h5>Bank Balance</h5>
-                                    <section className="main-table">
-                                        <table className="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Bank Name</th>
-                                                    <th>Account Name</th>
-                                                    <th>Balance</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {shop.current_balance.bank_balance.length > 0 ? (
-                                                    shop.current_balance.bank_balance.map((bank) => (
-                                                        <tr key={bank.id}>
-                                                            <td>{bank.bank_name}</td>
-                                                            <td>{bank.account_name}</td>
-                                                            <td>₹{bank.balance.toLocaleString()}</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="3" className="text-center">
-                                                            No Bank Balance Available
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-
-                                    </section>
-                                </div>
-
-                                {/* Cash Details */}
-                                <div className="col-md-12 mt-2">
-                                    <h5>Cash Balance</h5>
-                                    <section className="main-table">
-                                        <table className="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Currency</th>
-                                                    <th>Quantity</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {shop.current_balance.cash.length > 0 ? (
-                                                    shop.current_balance.cash.map((item) => (
-                                                        <tr key={item.id}>
-                                                            <td>₹{item.currency}</td>
-                                                            <td>{item.quantity}</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="2" className="text-center">
-                                                            No Cash Available
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-
-                                    </section>
-                                </div>
-
-
-                            </div>
+                            <ShopTransations id={id} />
                         </div>
                     </div>
                 </section>

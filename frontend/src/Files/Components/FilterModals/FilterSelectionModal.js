@@ -2,17 +2,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 
-function FilterSelectionModal({ title, options, selectedOptions, onSelect }) {
+function FilterSelectionModal({ title, options, selectedOptions, onSelect , searchable = true , selectableAll = true }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+    // const [tempSelectedOptions, setTempSelectedOptions] = useState([
+    //     ...selectedOptions,
+    // ]);
     const [tempSelectedOptions, setTempSelectedOptions] = useState([
-        ...selectedOptions,
-    ]);
+        ...(selectedOptions && Array.isArray(selectedOptions) ? selectedOptions : []),
+      ]);
+      
     const buttonRef = useRef(null);
     const modalRef = useRef(null); // Ref for the modal container
 
     useEffect(() => {
-        setTempSelectedOptions([...selectedOptions]);
+        setTempSelectedOptions([
+            // ...selectedOptions
+            ...(selectedOptions && Array.isArray(selectedOptions) ? selectedOptions : []),
+        ]);
     }, [selectedOptions]);
 
     useEffect(() => {
@@ -71,11 +78,17 @@ function FilterSelectionModal({ title, options, selectedOptions, onSelect }) {
         setIsOpen(!isOpen);
     };
 
+    // const filteredOptions = options.filter(
+    //     (option) =>
+    //         option.label &&
+    //         option.label.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    // );
+
     const filteredOptions = options.filter(
         (option) =>
-            option.label &&
-            option.label.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
+          option.label !== null && option.label !== undefined &&
+          option.label.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
     const getModalPosition = () => {
         if (buttonRef.current) {
@@ -90,22 +103,29 @@ function FilterSelectionModal({ title, options, selectedOptions, onSelect }) {
 
     const modalContent = (
         <div className="filter-modal" style={getModalPosition()} ref={modalRef}>
-            <input
-                className="form-control mb-2"
-                type="text"
-                placeholder={`Search ${title}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <div>
+
+            {searchable && (
                 <input
-                    type="checkbox"
-                    id="selectAll"
-                    checked={tempSelectedOptions.length === options.length}
-                    onChange={handleSelectAll}
+                    className="form-control mb-2"
+                    type="text"
+                    placeholder={`Search ${title}...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <label for="selectAll">Select All</label>
-            </div>
+            )}
+
+            {selectableAll && (
+                <div>
+                    <input
+                        type="checkbox"
+                        id="selectAll"
+                        checked={tempSelectedOptions.length === options.length}
+                        onChange={handleSelectAll}
+                    />
+                    <label htmlFor="selectAll">Select All</label>
+                </div>
+
+            )}
             <div className="filter-options">
 
                 <ul className="ps-0 mb-0">
@@ -148,7 +168,7 @@ function FilterSelectionModal({ title, options, selectedOptions, onSelect }) {
                 onClick={handleToggleOpen}
                 style={{ cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}
             >
-                {title} <i class="fa-solid fa-angle-down"></i>
+                {title} <i className="fa-solid fa-angle-down"></i>
             </div>
             {isOpen && ReactDOM.createPortal(modalContent, document.body)}
         </div>

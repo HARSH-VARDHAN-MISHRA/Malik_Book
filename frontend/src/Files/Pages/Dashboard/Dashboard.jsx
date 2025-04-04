@@ -97,34 +97,34 @@ const Dashboard = () => {
 
         {/* <div className="col-xl-12 dashboard">
 
-            <div className="row">
-              {dummyData.map((item, index) => (
-                <div className="col-xxl-3 col-xl-6 col-md-6" key={index}>
-                  <div className="card custom-card position-relative rounded mb-2">
-                    <div className="card-body p-3 dash-bg-image">
-                      <div className="d-flex align-items-start justify-content-between mb-2 gap-1 flex-xxl-nowrap flex-wrap">
-                        <div>
-                          <span className="text-muted d-block mb-1 text-nowrap">{item.title}</span>
-                          <h4 className="fw-bold mb-0 mt-0 fs-2">{item.value}</h4>
-                        </div>
-                        <div className="dash-absolute-icon">
-                          <span className={`avatar ${item.bgClass}`}>{item.icon}</span>
-                        </div>
+          <div className="row">
+            {dummyData.map((item, index) => (
+              <div className="col-xxl-3 col-xl-6 col-md-6" key={index}>
+                <div className="card custom-card position-relative rounded mb-2">
+                  <div className="card-body p-3 dash-bg-image">
+                    <div className="d-flex align-items-start justify-content-between mb-2 gap-1 flex-xxl-nowrap flex-wrap">
+                      <div>
+                        <span className="text-muted d-block mb-1 text-nowrap">{item.title}</span>
+                        <h4 className="fw-bold mb-0 mt-0 fs-2">{item.value}</h4>
                       </div>
-                      <div className="text-muted fs-13">
-                        {item.changeType === 'increase' ? (
-                          <>Increased By <span className="text-success">{item.change}<i className="ti ti-arrow-narrow-up fs-16"></i></span></>
-                        ) : (
-                          <>Decreased By <span className="text-danger">{item.change}<i className="ti ti-arrow-narrow-down fs-16"></i></span></>
-                        )}
+                      <div className="dash-absolute-icon">
+                        <span className={`avatar ${item.bgClass}`}>{item.icon}</span>
                       </div>
+                    </div>
+                    <div className="text-muted fs-13">
+                      {item.changeType === 'increase' ? (
+                        <>Increased By <span className="text-success">{item.change}<i className="ti ti-arrow-narrow-up fs-16"></i></span></>
+                      ) : (
+                        <>Decreased By <span className="text-danger">{item.change}<i className="ti ti-arrow-narrow-down fs-16"></i></span></>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
 
-            </div>
-          </div> */}
+          </div>
+        </div> */}
 
         <div className="row">
 
@@ -140,56 +140,87 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="row">
-                {shops.map((shop) => (
-                  <div className="col-md-4 mb-4" key={shop.id}>
-                    <div className="card shadow-sm h-100">
-                      <div className="card-body">
-                        <h5 className="card-title">{shop.name}</h5>
-                        <p className="card-text">
-                          <strong>Address:</strong> {shop.address} <br />
-                          <strong>Contact:</strong> {shop.contact_number || "N/A"} <br />
-                        </p>
+                {shops.map((shop) => {
+                  // Calculate totals
+                  const totalBank = shop.current_balance.bank_balance.reduce((sum, bank) => sum + bank.balance, 0);
+                  const totalCash = shop.current_balance.cash.reduce((sum, cash) => sum + (cash.currency * cash.quantity), 0);
+                  const grandTotal = totalBank + totalCash;
 
-                        {/* Display Bank Balances */}
-                        <h6 className="mt-3">Bank Balances:</h6>
-                        {shop.current_balance.bank_balance.length > 0 ? (
-                          <ul className="list-group mb-2">
-                            {shop.current_balance.bank_balance.map((bank) => (
-                              <li className="list-group-item d-flex justify-content-between" key={bank.id}>
-                                <span>{bank.bank_name}</span>
-                                <strong>₹{bank.balance.toLocaleString()}</strong>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-muted">No bank balance available.</p>
-                        )}
+                  return (
+                    <div className="col-md-4 mb-4" key={shop.id}>
+                      <div className="card shadow-sm h-100">
+                        <div className="card-body">
+                          <h5 className="card-title">{shop.name}</h5>
+                          <p className="card-text">
+                            <strong>Address:</strong> {shop.address} <br />
+                            <strong>Contact:</strong> {shop.contact_number || "N/A"} <br />
+                          </p>
 
-                        {/* Display Cash Balances */}
-                        <h6>Cash Balances:</h6>
-                        {shop.current_balance.cash.length > 0 ? (
-                          <ul className="list-group mb-3">
-                            {shop.current_balance.cash.map((cash) => (
-                              <li className="list-group-item d-flex justify-content-between" key={cash.id}>
-                                <span>₹{cash.currency} x {cash.quantity}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-muted">No cash available.</p>
-                        )}
+                          {/* Bank Balances */}
+                          <h6 className="mt-3">Bank Balances:</h6>
+                          {shop.current_balance.bank_balance.length > 0 ? (
+                            <>
+                              <ul className="list-group mb-2">
+                                {shop.current_balance.bank_balance.map((bank) => (
+                                  <li className="list-group-item d-flex justify-content-between" key={bank.id}>
+                                    <span>{bank.bank_name}</span>
+                                    <strong>₹{bank.balance.toLocaleString()}</strong>
+                                  </li>
+                                ))}
+                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                  <span>Total Bank Balance:</span>
+                                  <span>₹{totalBank.toLocaleString()}</span>
+                                </li>
+                              </ul>
+                              {/* <p className="fw-bold text-success">Total Bank Balance: ₹{totalBank.toLocaleString()}</p> */}
+                            </>
+                          ) : (
+                            <p className="text-muted">No bank balance available.</p>
+                          )}
 
-                        {/* Navigate to Shop Details Page */}
-                        <button
-                          className="btn btn-primary w-100"
-                          onClick={() => navigate(`/shop-details/${shop.id}`)}
-                        >
-                          <i className="fa-solid fa-arrow-right"></i> View Details
-                        </button>
+                          {/* Cash Balances */}
+                          <h6>Cash Balances:</h6>
+                          {shop.current_balance.cash.length > 0 ? (
+                            <>
+                              <ul className="list-group mb-2">
+                                {shop.current_balance.cash.map((cash) => (
+                                  <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                    <span>₹{cash.currency} x {cash.quantity}</span>
+                                    <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
+                                  </li>
+                                ))}
+                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                  <span>Total Cash Balance:</span>
+                                  <span>₹{totalCash.toLocaleString()}</span>
+                                </li>
+                              </ul>
+                              {/* <p className="fw-bold text-success">Total Cash Balance: ₹{totalCash.toLocaleString()}</p> */}
+                            </>
+                          ) : (
+                            <p className="text-muted">No cash available.</p>
+                          )}
+
+                          {/* Grand Total */}
+                          <li className="d-flex justify-content-between fs-5 fw-medium my-1">
+                            <span>Grand Total:</span>
+                            <span className="text-danger">₹{grandTotal.toLocaleString()}</span>
+                          </li>
+
+
+
+                          {/* View Details Button */}
+                          <button
+                            className="btn btn-primary w-100"
+                            onClick={() => navigate(`/shop-details/${shop.id}`)}
+                          >
+                            <i className="fa-solid fa-arrow-right"></i> View Details
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+
               </div>
             )}
 

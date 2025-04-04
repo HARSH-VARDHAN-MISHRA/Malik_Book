@@ -1,4 +1,9 @@
-export const BASE_URL = 'http://192.168.1.61:8001';
+// Home
+// export const BASE_URL = 'http://192.168.1.61:8001';
+
+// Office
+export const BASE_URL = 'http://192.168.1.38:8001';
+
 export const PREFIX_URL = `${BASE_URL}/api`;
 
 // API KEY

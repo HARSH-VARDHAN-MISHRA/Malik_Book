@@ -29,16 +29,16 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+
         const sendData = { email, password };
 
-    
+
         try {
             // const response = await axios.post(LOGIN, sendData);
             const response = await axios.post(LOGIN, sendData, { withCredentials: true });
 
             console.log("Response:", response);
-    
+
             if (response.data.status === 1) {
                 const userDetails = {
                     id: response.data.data.id,
@@ -60,11 +60,11 @@ function Login() {
             setLoading(false);
         }
     };
-    
-    
+
+
     return (
         <>
-        
+
             {/* {loading && "LOADING"} */}
             <div className="login-container">
                 <div className="login-box">
@@ -102,8 +102,16 @@ function Login() {
                                 </span>
                             </div>
                         </div>
-                        <button type="submit" className="submit-button">
-                            Login
+                        <button
+                            type="submit"
+                            className="submit-button"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <i className="fa fa-spinner fa-spin"></i> 
+                            ) : (
+                                'Login'
+                            )}
                         </button>
                     </form>
                 </div>

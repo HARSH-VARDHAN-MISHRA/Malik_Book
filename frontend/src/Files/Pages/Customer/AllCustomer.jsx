@@ -59,7 +59,7 @@ const AllCustomer = () => {
         axios
             .post(GET_CUSTOMERS, data, { headers })
             .then((response) => {
-                // console.log(response.data.customers);
+                // console.log(response.data.data);
                 setCustomers(response.data.data);
                 setTotalPages(response.data.total_pages);
                 setTotalRows(response.data.total_rows);

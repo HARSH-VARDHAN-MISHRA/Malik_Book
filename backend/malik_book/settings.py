@@ -33,6 +33,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.61:3000",
     "http://localhost:3000",  
+    "http://localhost:3002",  
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False  
