@@ -11,6 +11,8 @@ import PayPaymentModal from "../Transactions/PayPaymentModal";
 import ReceivePaymentModal from "../Transactions/ReceivePaymentModal";
 import AddBankAccount from "./AddBankAccount";
 import ShopUsers from "./ShopUsers";
+import DepositMoney from "../Transactions/DepositMoney";
+import WithdrawMoney from "../Transactions/WithdrawMoney";
 
 const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
@@ -118,7 +120,6 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
     const handleCloseMakePaymentModal = () => {
         setOpenMakePaymentModal(false);
-        fetchData()
     };
 
     // Receive Payment Modal
@@ -129,7 +130,28 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
     const handleCloseReceivePaymentModal = () => {
         setOpenReceivePaymentModal(false);
-        fetchData()
+    };
+
+
+    // Deposit Money Modal
+    const [openDepositMoneyModal, setOpenDepositMoneyModal] = useState(false);
+    const handleOpenDepositMoneyModal = () => {
+        setOpenDepositMoneyModal(true);
+    };
+
+    const handleCloseDepositMoneyModal = () => {
+        setOpenDepositMoneyModal(false);
+    };
+
+
+    // Withdraw Money Modal
+    const [openWithdrawMoneyModal, setOpenWithdrawMoneyModal] = useState(false);
+    const handleOpenWithdrawMoneyModal = () => {
+        setOpenWithdrawMoneyModal(true);
+    };
+
+    const handleCloseWithdrawMoneyModal = () => {
+        setOpenWithdrawMoneyModal(false);
     };
 
 
@@ -150,11 +172,11 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
     const handleOpenShopUsersModal = () => {
         setOpenShopUsersModal(true);
     };
-    
+
     const handleCloseShopUsersModal = () => {
         setOpenShopUsersModal(false);
     };
-    
+
 
 
 
@@ -193,6 +215,31 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                     fetchData={fetchData}
                 />
             )}
+
+            {openDepositMoneyModal && (
+                <DepositMoney
+                    open={openDepositMoneyModal}
+                    handleClose={handleCloseDepositMoneyModal}
+                    shopPk={id}
+                    balance={balance}
+                    fetchShopDetail={fetchShopDetail}
+                    fetchData={fetchData}
+                />
+            )}
+
+
+
+            {openWithdrawMoneyModal && (
+                <WithdrawMoney
+                    open={openWithdrawMoneyModal}
+                    handleClose={handleCloseWithdrawMoneyModal}
+                    shopPk={id}
+                    balance={balance}
+                    fetchShopDetail={fetchShopDetail}
+                    fetchData={fetchData}
+                />
+            )}
+
             {openShopUsersModal && (
                 <ShopUsers
                     open={openShopUsersModal}
@@ -234,6 +281,18 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                     </button>
                                 </>
                             ) : null}
+
+
+                            <button className="btn btn-success"
+                                onClick={() => handleOpenDepositMoneyModal()}
+                                >
+                                Deposit
+                            </button>
+                            <button className="btn btn-danger"
+                                onClick={() => handleOpenWithdrawMoneyModal()}
+                            >
+                                Withdraw
+                            </button>
 
                             <button className="btn btn-secondary"
                                 onClick={() => handleOpenMakePaymentModal()}
@@ -283,8 +342,8 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                             </th>
                             <th>Cash</th>
                             <th>Bank</th>
+                            <th>Created By</th>
                             <th>Remark</th>
-                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -308,7 +367,17 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                 return (
                                     <tr key={txn.id}>
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                                        <td className="text-nowrap">{txn.date}</td>
+                                        <td className="text-nowrap">
+                                        {new Date(txn.date).toLocaleString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                                // hour: 'numeric',
+                                                // minute: '2-digit',
+                                                // hour12: true,
+                                            })}
+
+                                        </td>
                                         <td>
                                             <strong>{txn.customer?.name || "-"}</strong>
                                             <br />
@@ -322,17 +391,10 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
                                         <td className="text-nowrap">{totalCash ? `₹ ${totalCash}` : '-'}</td>
                                         <td className="text-nowrap">{totalBank ? `₹ ${totalBank}` : '-'}</td>
-                                        <td>{txn.remark || "-"}</td>
                                         <td className="text-nowrap">
-                                            {new Date(txn.created_at).toLocaleString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: 'numeric',
-                                                minute: '2-digit',
-                                                hour12: true,
-                                            })}
+                                            {txn.created_by}
                                         </td>
+                                        <td>{txn.remark || "-"}</td>
 
                                     </tr>
                                 );
