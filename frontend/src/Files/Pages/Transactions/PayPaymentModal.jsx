@@ -182,7 +182,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                                         </li>
                                     ))}
                                     <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
-                                        <span>Total Cash:</span>
+                                        <span>Total Amount:</span>
                                         <span>₹{totalCash.toLocaleString()}</span>
                                     </li>
                                 </ul>
@@ -194,42 +194,49 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                         {/* Bank Section */}
                         <div className="col-xl-6">
                             <h6 className="mt-2">Bank Accounts:</h6>
-                            {balance.bank_balance.length > 0 ? (
-                                <>
-                                    {balance.bank_balance
-                                        .filter((bank) => bank.balance > 0)
-                                        .map((bank) => (
-                                            <div className="card mb-3" key={bank.id}>
-                                                <div className="card-body d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 className="mb-1">{bank.bank_name}</h6>
-                                                        <p className="mb-0 small">Account No: {bank.account_number}</p>
-                                                        <p className="mb-0 small">IFSC: {bank.ifsc_code}</p>
-                                                        <p className="mb-0 small">Holder Name: {bank.account_name}</p>
-                                                        <strong>Available: ₹{bank.balance.toLocaleString()}</strong>
+                            <div style={{ height: "40dvh", overflow: "auto" }}>
+                                {balance.bank_balance.length > 0 ? (
+                                    <>
+                                        {balance.bank_balance
+                                            .filter((bank) => bank.balance > 0)
+                                            .map((bank) => (
+                                                <div className="card mb-3" key={bank.id}>
+                                                    <div className="card-body d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <h6 className="mb-1">{bank.bank_name}</h6>
+                                                            <p className="mb-0 small">Account No: {bank.account_number}</p>
+                                                            <p className="mb-0 small">IFSC: {bank.ifsc_code}</p>
+                                                            <p className="mb-0 small">Holder Name: {bank.account_name}</p>
+                                                            <strong>Available: ₹{bank.balance.toLocaleString()}</strong>
+                                                        </div>
+                                                        <Form.Control
+                                                            type="number"
+                                                            className="ms-3"
+                                                            placeholder="Amount"
+                                                            min="0"
+                                                            max={bank.balance}
+                                                            value={bankInputs[bank.id] ?? ""}
+                                                            onChange={(e) => handleBankInputChange(bank.id, e.target.value, bank.balance)}
+                                                            style={{ width: 120 }}
+                                                            disabled={loading}
+                                                        />
                                                     </div>
-                                                    <Form.Control
-                                                        type="number"
-                                                        className="ms-3"
-                                                        placeholder="Amount"
-                                                        min="0"
-                                                        max={bank.balance}
-                                                        value={bankInputs[bank.id] ?? ""}
-                                                        onChange={(e) => handleBankInputChange(bank.id, e.target.value, bank.balance)}
-                                                        style={{ width: 120 }}
-                                                        disabled={loading}
-                                                    />
                                                 </div>
-                                            </div>
-                                        ))}
-                                    <div className="d-flex justify-content-between fw-medium text-secondary px-2">
-                                        <span>Total Bank:</span>
-                                        <span>₹{totalBank.toLocaleString()}</span>
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-muted">No bank accounts available.</p>
-                            )}
+                                            ))}
+                                    </>
+                                ) : (
+                                    <p className="text-muted">No bank accounts available.</p>
+                                )}
+
+                            </div>
+                            <ul className="list-group">
+                                <li></li>
+                                <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
+                                    <span>Total Amount:</span>
+                                    <span>₹{totalBank.toLocaleString()}</span>
+                                </li>
+                            </ul>
+
                         </div>
 
                         {/* Grand Total */}

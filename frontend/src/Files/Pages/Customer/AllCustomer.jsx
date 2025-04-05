@@ -252,40 +252,58 @@ const AllCustomer = () => {
                             <th>Contact</th>
                             <th>Email</th>
                             <th>Address</th>
+                            <th>Total Transactions</th>
+                            <th>Paid Amount</th>
+                            <th>Received Amount</th>
+                            <th>Advance</th>
+                            <th>Due</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-
                         {loading ? (
                             <tr>
-                                <td className="text-center loading-table" colSpan={10}>Loading..</td>
+                                <td className="text-center loading-table" colSpan={11}>Loading..</td>
                             </tr>
                         ) : (
-                            customers && customers.map((customer) => (
-                                <tr key={customer.id}>
+                            customers && customers.map((customer) => {
+                                const advance = customer.total_received_amount > customer.total_paid_amount
+                                    ? customer.total_received_amount - customer.total_paid_amount
+                                    : 0;
 
-                                    <td>{customer.id}</td>
-                                    <td>
-                                        <Link to={`/customer-detail/${customer.id}`}>
-                                            {customer.name}
-                                        </Link>
-                                    </td>
-                                    <td>{customer.phone || "-"}</td>
-                                    <td>{customer.email || "-"}</td>
-                                    <td>{customer.address || "-"}</td>
-                                    <td className="actions">
-                                        <button className="btn btn-primary" onClick={() => handleOpenEditCustomerModal(customer)}>
-                                            <i className="fa-solid fa-edit"></i>
-                                        </button>
-                                        <button className="btn btn-danger" onClick={() => handleDeleteCustomerModal(customer)} >
-                                            <i className="fa-solid fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
+                                const due = customer.total_paid_amount > customer.total_received_amount
+                                    ? customer.total_paid_amount - customer.total_received_amount
+                                    : 0;
+
+                                return (
+                                    <tr key={customer.id}>
+                                        <td>{customer.id}</td>
+                                        <td>
+                                            <Link to={`/customer-detail/${customer.id}`}>
+                                                {customer.name}
+                                            </Link>
+                                        </td>
+                                        <td>{customer.phone || "-"}</td>
+                                        <td>{customer.email || "-"}</td>
+                                        <td>{customer.address || "-"}</td>
+                                        <td className="text-center">{customer.total_transactions}</td>
+                                        <td>{customer.total_paid_amount ? `₹${customer.total_paid_amount}` : '-'}</td>
+                                        <td>{customer.total_received_amount ? `₹${customer.total_received_amount}` : '-'}</td>
+                                        <td className="text-success">{advance ? `₹${advance}` : '-'}</td>
+                                        <td className="text-danger">{due ? `₹${due}` : '-'}</td>
+
+                                        <td className="actions">
+                                            <button className="btn btn-primary" onClick={() => handleOpenEditCustomerModal(customer)}>
+                                                <i className="fa-solid fa-edit"></i>
+                                            </button>
+                                            <button className="btn btn-danger" onClick={() => handleDeleteCustomerModal(customer)} >
+                                                <i className="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         )}
-
                     </tbody>
                 </table>
             </section>
