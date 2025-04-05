@@ -115,6 +115,17 @@ function AllRoutes() {
                   </>
                 }
               />
+              <Route
+                path="/shop-deposit-and-withdraw-history/:id"
+                element={
+                  <>
+                    <Helmet> ShopDepositWithdrawHistory
+                      <title>Shop Deposit & Withdraw History - Account Mangement</title>{" "}
+                    </Helmet>
+                    <ShopDetail />
+                  </>
+                }
+              />
 
 
 

@@ -149,7 +149,7 @@ class DailyClosingBankBalance(models.Model):
 
 class DepositWithdrawHistory(models.Model):
     shop=models.ForeignKey(Shop,on_delete=models.CASCADE)
-    date=models.DateField()
+    date=models.DateField(auto_now_add=True)
     type=models.CharField(max_length=100)
     remark=models.CharField(max_length=255,null=True,blank=True)
     created_by=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)

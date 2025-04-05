@@ -98,10 +98,10 @@ class DepositAndWithdrawHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = DepositWithdrawHistory
         fields = ['id', 'date','created_at', 'remark', 'type','created_by','cash_dinomination','payment_detail']
-    def get_cash_denomination(self, obj):
+    def get_cash_dinomination(self, obj):
         return DepositWithdrawHistoryCashDenomination.objects.filter(deposit_withdraw_history=obj).values('currency__currency','quantity')
     def get_payment_detail(self, obj):
-        history_payment_details=DepositWithdrawHistoryPaymentDetail.objects.filter(transaction=obj)
+        history_payment_details=DepositWithdrawHistoryPaymentDetail.objects.filter(deposit_withdraw_history=obj)
         return DepositAndWithdrawPaymentDetailSerializer(history_payment_details, many=True).data
     def get_created_by(self, obj):
         return {
