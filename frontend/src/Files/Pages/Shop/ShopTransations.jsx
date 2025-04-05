@@ -9,6 +9,8 @@ import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import PayPaymentModal from "../Transactions/PayPaymentModal";
 import ReceivePaymentModal from "../Transactions/ReceivePaymentModal";
+import AddBankAccount from "./AddBankAccount";
+import ShopUsers from "./ShopUsers";
 
 const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
@@ -130,6 +132,33 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
         fetchData()
     };
 
+
+    // Add Bank Account Modal
+    const [openAddBankAccountModal, setOpenAddBankAccountModal] = useState(false);
+
+    const handleOpenAddBankAccountModal = () => {
+        setOpenAddBankAccountModal(true);
+    };
+
+    const handleCloseAddBankAccountModal = () => {
+        setOpenAddBankAccountModal(false);
+    };
+
+    // Shop Users 
+    const [openShopUsersModal, setOpenShopUsersModal] = useState(false);
+
+    const handleOpenShopUsersModal = () => {
+        setOpenShopUsersModal(true);
+    };
+    
+    const handleCloseShopUsersModal = () => {
+        setOpenShopUsersModal(false);
+    };
+    
+
+
+
+
     return (
         <>
             {loading && <Loader />}
@@ -154,6 +183,23 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                     fetchData={fetchData}
                 />
             )}
+            {openAddBankAccountModal && (
+                <AddBankAccount
+                    open={openAddBankAccountModal}
+                    handleClose={handleCloseAddBankAccountModal}
+                    shopPk={id}
+                    balance={balance}
+                    fetchShopDetail={fetchShopDetail}
+                    fetchData={fetchData}
+                />
+            )}
+            {openShopUsersModal && (
+                <ShopUsers
+                    open={openShopUsersModal}
+                    handleClose={handleCloseShopUsersModal}
+                    shopPk={id}
+                />
+            )}
 
 
             <div className="top-content mb-2">
@@ -174,6 +220,21 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                     </div>
                     <div className="col-xl-8 ">
                         <div className="top-content-btns mt-1 mt-md-0">
+
+                            {userDetails.role?.toLowerCase() === "admin" ? (
+                                <>
+                                    <button className="btn btn-primary" onClick={() => setOpenShopUsersModal(true)}>
+                                        <i className="fa-solid fa-users"></i> Users
+                                    </button>
+
+                                    <button className="btn btn-primary"
+                                        onClick={() => handleOpenAddBankAccountModal()}
+                                    >
+                                        <i class="fa-solid fa-building-columns"></i> Add Bank Account
+                                    </button>
+                                </>
+                            ) : null}
+
                             <button className="btn btn-secondary"
                                 onClick={() => handleOpenMakePaymentModal()}
                             >

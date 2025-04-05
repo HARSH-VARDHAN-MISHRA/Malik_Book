@@ -7,6 +7,8 @@ import { GET_ALL_SHOPS } from "../../../api";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ShopTransations from "../Shop/ShopTransations";
+import AddShopModal from "../Shop/AddShopModal";
+import Loader from "../../Components/Loader/Loader";
 
 const Dashboard = () => {
 
@@ -28,7 +30,7 @@ const Dashboard = () => {
       }
     }
 
-    
+
 
     const getGreeting = () => {
       const hour = new Date().getHours();
@@ -82,14 +84,22 @@ const Dashboard = () => {
   };
 
 
+  // Add Shop Modal
+  const [openAddShopModal, setOpenAddShopModal] = useState(false);
 
 
 
 
   return (
     <>
+      {shopLoading && <Loader /> }
+      <AddShopModal
+        open={openAddShopModal}
+        handleClose={() => setOpenAddShopModal(false)}
+        getAllShops={getAllShops}
+      />
 
-      <div className="container-fluid">
+      <div className="">
 
         {/* <div className="row bg-white p-3 mb-4">
           <div className="d-flex align-items-center gap-3">
@@ -134,6 +144,16 @@ const Dashboard = () => {
 
 
         {/* For ADMIN */}
+        <div className="text-end mb-2">
+        {isAdmin && (
+          <button
+            className="btn btn-success"
+            onClick={() => setOpenAddShopModal(true)}
+          >
+            Create Shop
+          </button>
+        )}
+        </div>
         <div className="row">
           {/* All Shops */}
 
@@ -141,7 +161,7 @@ const Dashboard = () => {
 
             {shopLoading ? (
               <div className="text-center">
-                <div className="spinner-border text-primary" role="status">
+                <div className="spinner-border text-warning" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
@@ -235,7 +255,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-
+       
 
         {/* Shop Transations for users */}
 

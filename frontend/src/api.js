@@ -1,9 +1,9 @@
 // Home
-// export const BASE_URL = 'http://192.168.1.61:8001';
+export const BASE_URL = 'http://192.168.1.61:8001';
 
 // Office
 // export const BASE_URL = 'http://192.168.1.38:8001';
-export const BASE_URL = 'http://192.168.1.30:8001';
+// export const BASE_URL = 'http://192.168.1.30:8001';
 
 export const PREFIX_URL = `${BASE_URL}/api`;
 
@@ -20,6 +20,14 @@ export const FETCH_ALL_PRODUCTS = `${PREFIX_URL}/get-products/`;
 // Shops
 export const GET_ALL_SHOPS = `${PREFIX_URL}/get-all-shops/`;
 export const GET_SHOP_DETAIL = `${PREFIX_URL}/get-shop-deatil/`;
+export const GET_SHOP_USERS = `${PREFIX_URL}/get-shop-users/`;
+export const ADD_SHOP = `${PREFIX_URL}/add-shop/`;
+export const ADD_BANK_ACCOUNT = `${PREFIX_URL}/add-bank-account/`;
+
+// Users
+export const ADD_USER = `${PREFIX_URL}/add-user/`;
+export const UPDATE_USER = `${PREFIX_URL}/update-user/`;
+export const DELETE_USER = `${PREFIX_URL}/delete-user/`;
 
 
 // Customer
