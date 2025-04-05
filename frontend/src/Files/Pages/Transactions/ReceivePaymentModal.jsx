@@ -31,7 +31,10 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                 }
             );
 
+            // console.log("customers : ", res.data.data)
+
             return res.data.data.map((cust) => ({
+                ...cust,
                 value: cust.id,
                 label: `${cust.name} (${cust.phone})`,
             }));
@@ -67,14 +70,6 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
         setTotalBank(total);
     };
 
-    const calculateTotalCash = () => {
-        return balance.cash.reduce((sum, item) => {
-            const qty = cashInputs[item.id] || 0;
-            return sum + qty * item.currency;
-        }, 0);
-    };
-
-    // console.log("Balance : ",balance);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -154,6 +149,21 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                             value={selectedCustomer}
                             isDisabled={loading}
                             placeholder="Search customer..."
+                            formatOptionLabel={(option) => (
+                                <div>
+                                    <div className="fw-medium small">{option.name} ({option.phone})</div>
+                                    <div className="small ">
+                                        {option.address && (
+                                            <span>
+                                                {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
+                                            </span>
+                                        )}
+                                        <i className="fas fa-money-bill-wave me-1"></i>
+                                        Paid: ₹{option.total_paid_amount.toLocaleString()} |
+                                        Received: ₹{option.total_received_amount.toLocaleString()}
+                                    </div>
+                                </div>
+                            )}
                         />
                     </div>
 
@@ -163,25 +173,39 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                             <h6 className="mt-2">Cash Balances:</h6>
                             {balance.cash.length > 0 ? (
                                 <ul className="list-group mb-3">
-                                    {balance.cash.map((cash) => (
-                                        <li
-                                            className="list-group-item d-flex justify-content-between align-items-center"
-                                            key={cash.id}
-                                        >
-                                            <div className="w-50">
-                                                ₹{cash.currency} 
-                                            </div>
-                                            <Form.Control
-                                                type="number"
-                                                min="0"
-                                                placeholder="Qty"
-                                                value={cashInputs[cash.id] ?? ""}
-                                                onChange={(e) => handleCashChange(cash.id, e.target.value, cash.quantity)}
-                                                style={{ width: 100 }}
-                                                disabled={loading}
-                                            />
-                                        </li>
-                                    ))}
+                                     <div style={{ height: "40dvh", overflow: "auto" }}>
+                {balance.cash.map((cash) => {
+                    const inputQty = Number(cashInputs[cash.id]) || 0;
+                    const totalForThisCash = inputQty * cash.currency;
+
+                    return (
+                        <li
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                            key={cash.id}
+                        >
+                            <div className="w-75">
+                                ₹{cash.currency}
+                                {inputQty > 0 && (
+                                    <div className="text-success small">
+                                        ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
+                                    </div>
+                                )}
+                            </div>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                placeholder="Qty"
+                                value={cashInputs[cash.id] ?? ""}
+                                onChange={(e) =>
+                                    handleCashChange(cash.id, e.target.value, cash.quantity)
+                                }
+                                style={{ width: 100 }}
+                                disabled={loading}
+                            />
+                        </li>
+                    );
+                })}
+            </div>
                                     <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
                                         <span>Total Cash:</span>
                                         <span>₹{totalCash.toLocaleString()}</span>
@@ -195,9 +219,10 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                         {/* Bank Section */}
                         <div className="col-xl-6">
                             <h6 className="mt-2">Bank Accounts:</h6>
-                            {balance.bank_balance.length > 0 ? (
-                                <>
-                                    {balance.bank_balance.map((bank) => (
+                            <div style={{ height: "40dvh", overflow: "auto" }}>
+                                {balance.bank_balance.length > 0 ? (
+                                    <>
+                                        {balance.bank_balance.map((bank) => (
                                             <div className="card mb-3" key={bank.id}>
                                                 <div className="card-body d-flex justify-content-between align-items-start">
                                                     <div>
@@ -219,14 +244,18 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                                                 </div>
                                             </div>
                                         ))}
-                                    <div className="d-flex justify-content-between fw-medium text-secondary px-2">
-                                        <span>Total Bank:</span>
-                                        <span>₹{totalBank.toLocaleString()}</span>
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-muted">No bank accounts available.</p>
-                            )}
+                                    </>
+                                ) : (
+                                    <p className="text-muted">No bank accounts available.</p>
+                                )}
+                            </div>
+                            <ul className="list-group">
+                                <li></li>
+                                <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
+                                    <span>Total Amount:</span>
+                                    <span>₹{totalBank.toLocaleString()}</span>
+                                </li>
+                            </ul>
                         </div>
 
                         {/* Grand Total */}

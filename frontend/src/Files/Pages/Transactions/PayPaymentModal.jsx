@@ -10,6 +10,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
 
     const [loading, setLoading] = useState(false);
     const [remark, setRemark] = useState("");
+
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
     const [cashInputs, setCashInputs] = useState({});
@@ -31,15 +32,27 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                 }
             );
 
+            // console.log("customers : ", res.data.data)
+
             return res.data.data.map((cust) => ({
+                ...cust,
                 value: cust.id,
                 label: `${cust.name} (${cust.phone})`,
             }));
+            
+
+            // return res.data.data.map((cust) => ({
+            //     value: cust.id,
+            //     label: `${cust.name} (${cust.phone})`,
+            // }));
         } catch (err) {
             toast.error("Failed to load customers");
             return [];
         }
     };
+
+
+
 
     // Cash Handler
     const handleCashChange = (id, value, maxQty) => {
@@ -67,12 +80,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
         setTotalBank(total);
     };
 
-    const calculateTotalCash = () => {
-        return balance.cash.reduce((sum, item) => {
-            const qty = cashInputs[item.id] || 0;
-            return sum + qty * item.currency;
-        }, 0);
-    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -106,7 +114,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
             remark,
         };
 
-        // ✅ Validation: At least one cash or bank amount is required
+
         if (cashDenomination.length === 0 && paymentDetails.length === 0) {
             toast.error("Please enter at least one cash or bank amount.");
             return;
@@ -144,6 +152,15 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                     {/* Select Customer */}
                     <div className="mb-3">
                         <label className="form-label">Select Customer</label>
+                        {/* <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadCustomerOptions}
+                            defaultOptions
+                            onChange={setSelectedCustomer}
+                            value={selectedCustomer}
+                            isDisabled={loading}
+                            placeholder="Search customer..."
+                        /> */}
                         <AsyncSelect
                             cacheOptions
                             loadOptions={loadCustomerOptions}
@@ -152,7 +169,23 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                             value={selectedCustomer}
                             isDisabled={loading}
                             placeholder="Search customer..."
+                            formatOptionLabel={(option) => (
+                                <div>
+                                    <div className="fw-medium small">{option.name} ({option.phone})</div>
+                                    <div className="small ">
+                                    {option.address && (
+                                        <span>
+                                            {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
+                                        </span>
+                                    )}
+                                        <i className="fas fa-money-bill-wave me-1"></i> 
+                                        Paid: ₹{option.total_paid_amount.toLocaleString()} |
+                                        Received: ₹{option.total_received_amount.toLocaleString()}
+                                    </div>
+                                </div>
+                            )}
                         />
+
                     </div>
 
                     <div className="row">
@@ -161,26 +194,40 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                             <h6 className="mt-2">Cash Balances:</h6>
                             {balance.cash.length > 0 ? (
                                 <ul className="list-group mb-3">
-                                    {balance.cash.map((cash) => (
-                                        <li
-                                            className="list-group-item d-flex justify-content-between align-items-center"
-                                            key={cash.id}
-                                        >
-                                            <div className="w-50">
-                                                ₹{cash.currency} x {cash.quantity}
-                                            </div>
-                                            <Form.Control
-                                                type="number"
-                                                min="0"
-                                                max={cash.quantity}
-                                                placeholder="Qty"
-                                                value={cashInputs[cash.id] ?? ""}
-                                                onChange={(e) => handleCashChange(cash.id, e.target.value, cash.quantity)}
-                                                style={{ width: 100 }}
-                                                disabled={loading}
-                                            />
-                                        </li>
-                                    ))}
+                                    <div style={{ height: "40dvh", overflow: "auto" }}>
+                                        {balance.cash.map((cash) => {
+                                            const inputQty = Number(cashInputs[cash.id]) || 0;
+                                            const totalForThisCash = inputQty * cash.currency;
+
+                                            return (
+                                                <li
+                                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                                    key={cash.id}
+                                                >
+                                                    <div className="w-75">
+                                                        ₹{cash.currency} x {cash.quantity}
+                                                        {inputQty > 0 && (
+                                                            <div className="text-success small">
+                                                                ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <Form.Control
+                                                        type="number"
+                                                        min="0"
+                                                        max={cash.quantity}
+                                                        placeholder="Qty"
+                                                        value={cashInputs[cash.id] ?? ""}
+                                                        onChange={(e) =>
+                                                            handleCashChange(cash.id, e.target.value, cash.quantity)
+                                                        }
+                                                        style={{ width: 100 }}
+                                                        disabled={loading}
+                                                    />
+                                                </li>
+                                            );
+                                        })}
+                                    </div>
                                     <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
                                         <span>Total Amount:</span>
                                         <span>₹{totalCash.toLocaleString()}</span>
@@ -248,7 +295,6 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                         </div>
                     </div>
 
-
                     {/* Remark */}
                     <div className="mb-3">
                         <label className="form-label">Remark</label>
@@ -261,6 +307,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                             disabled={loading}
                         />
                     </div>
+
                 </Modal.Body>
 
                 <Modal.Footer>
