@@ -4,11 +4,20 @@ from .views import home,auth,shops,customers
 
 urlpatterns = [
     path('', home.home_view),
+
+    # authentication
     path('login/',auth.login),
     path('check-token-validity/',auth.check_token_validity),
+    path('add-user/',auth.add_user),
+    path('update-user/',auth.update_user),
+    path('delete-user/',auth.delete_user),
+    
+    # shops
     path('get-all-shops/',shops.get_all_shops),
     path('get-shop-deatil/',shops.get_shop_detail),
-
+    path('add-shop/',shops.add_shop),
+    path('add-bank-account/',shops.add_bank_account),
+    path('get-shop-users/',shops.get_shop_users),
 
 
     # customers
@@ -21,7 +30,6 @@ urlpatterns = [
     path('make-payment/',shops.make_payment),
     path('receive-payment/',shops.receive_payment),
     path('get-transactions/',shops.get_transactions),
-
 
     # helpers
     path('get-currencies/',shops.get_currencies),

@@ -80,8 +80,21 @@ class AdminDailyClosingBankBalance(admin.ModelAdmin):
     search_fields = ['id','bank_account','amount']
 
 
+@admin.register(DepositWithdrawHistory)
+class AdminDepositWithdrawHistory(admin.ModelAdmin):
+    list_display = ('id','date','type','created_by','created_at','updated_at')
+    search_fields = ['id','date']
+
+@admin.register(DepositWithdrawHistoryCashDenomination)
+class AdminDepositWithdrawHistoryCashDenomination(admin.ModelAdmin):
+    list_display = ('id','currency','quantity')
+    search_fields = ['id']
 
 
+@admin.register(DepositWithdrawHistoryPaymentDetail)
+class AdminDepositWithdrawHistoryPaymentDetail(admin.ModelAdmin):
+    list_display = ('id','bank_account','amount')
+    search_fields = ['id']
 
 
 # hide section

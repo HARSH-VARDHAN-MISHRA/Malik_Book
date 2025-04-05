@@ -1,9 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from api.models import User,UserToken
+from api.models import User,UserToken,Shop
 from rest_framework_simplejwt.tokens import RefreshToken
 from functools import wraps
+from django.db import transaction
 
 def token_validator(view_func):
     @wraps(view_func)
@@ -89,3 +90,81 @@ def check_token_validity(request):
         return Response({"status": 1, "message": "Token is valid"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status": 0, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@token_validator
+def add_user(request):
+    try:
+        data=request.data
+        email=data.get('email',None)
+        name=data.get('name',None)
+        password=data.get('password',None)
+        shop_pk=data.get('shop_pk',None)
+
+        is_active=data.get('is_active',True)
+        if not email or len(email)<5:
+            return Response({"status":0,'message':"valid email is required"},status=status.HTTP_400_BAD_REQUEST)
+        if not name or len(name)<3:
+            return Response({"status":0,'message':"valid name is required"},status=status.HTTP_400_BAD_REQUEST)
+        if not password or len(password)<5:
+            return Response({"status":0,'message':"minimum 5 character password is required"},status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(email=email).exists():
+            return Response({"status":0,'message':"User with this email already exists"},status=status.HTTP_400_BAD_REQUEST)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        user=User(email=email,name=name,password=password,shop=current_shop,role="User",is_active=is_active)
+        user.save()
+        return Response({"status":1,'message':"User created successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,"message":str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def update_user(request):
+    try:
+        data=request.data
+        user_pk=data.get('user_pk',0)
+        user=User.objects.filter(pk=user_pk).first()
+        if not user:
+            return Response({"status":0,'message':"invalid user_pk"},status=status.HTTP_400_BAD_REQUEST)
+        email=data.get('email',None)
+        name=data.get('name',None)
+        password=data.get('password',None)
+
+        is_active=data.get('is_active',True)
+        if not email or len(email)<5:
+            return Response({"status":0,'message':"valid email is required"},status=status.HTTP_400_BAD_REQUEST)
+        if not name or len(name)<3:
+            return Response({"status":0,'message':"valid name is required"},status=status.HTTP_400_BAD_REQUEST)
+        if not password or len(password)<5:
+            return Response({"status":0,'message':"minimum 5 character password is required"},status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(email=email).exclude(pk=user_pk).exists():
+            return Response({"status":0,'message':"User with this email already exists"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            user.email=email
+            user.name=name
+            user.password=password
+            user.is_active=is_active
+            user.save()
+
+        return Response({"status":1,'message':"User updated successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,"message":str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@token_validator
+def delete_user(request):
+    try:
+        data=request.data
+        user_pk=data.get('user_pk',0)
+        user=User.objects.filter(pk=user_pk).first()
+        if not user:
+            return Response({"status":0,'message':"invalid user_pk"},status=status.HTTP_400_BAD_REQUEST)
+        user.delete()
+        return Response({"status":1,'message':"User deleted successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,"message":str(e)},status=status.HTTP_400_BAD_REQUEST)
+    

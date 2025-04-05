@@ -2,11 +2,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .auth import token_validator
-from api.models import Customer,Transaction
+from api.models import Customer,Transaction,TransactionCashDenomination,TransactionPaymentDetail
 from django.db import transaction
 from django.forms import model_to_dict
 from django.db.models import Q
 import math
+from api.serializers.customer_serializer import CustomerSerializer
 
 @api_view(["POST"])
 @token_validator
@@ -94,7 +95,7 @@ def get_customers(request):
         total_pages=math.ceil(total_rows/page_size)
         starting=(page_number-1)*page_size
         ending=starting+page_size
-        customers=list(all_customers[starting:ending].values())
+        customers=CustomerSerializer(all_customers[starting:ending],many=True).data
         return Response({"status":1,"data":customers,"total_pages":total_pages,"total_rows":total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
@@ -103,7 +104,14 @@ def get_customers(request):
 @token_validator
 def get_customer_detail(request):
     try:
-        pass
+        data=request.GET
+        customer_pk=data.get('customer_pk',0)
+        customer=Customer.objects.filter(pk=customer_pk).first()
+        if not customer:
+            return Response({"status":0,'message':"invalid customer_pk"},status=status.HTTP_400_BAD_REQUEST)
+        serialized_customer=CustomerSerializer(customer).data
+        return Response({"status":1,"data":serialized_customer},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+
 

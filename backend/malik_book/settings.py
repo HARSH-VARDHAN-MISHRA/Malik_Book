@@ -34,6 +34,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.61:3000",
     "http://localhost:3000",  
     "http://localhost:3002",  
+    'http://192.168.1.38:3002'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False  
@@ -81,16 +82,31 @@ WSGI_APPLICATION = 'malik_book.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+
+# local database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'malik_book',
-        'USER': 'malik',
-        'PASSWORD': 'Malik@5676',
-        'HOST': '212.38.94.126',
+        'USER': 'turbo',
+        'PASSWORD': 'tech@2024',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
+
+# live database 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'malik_book',
+#         'USER': 'malik',
+#         'PASSWORD': 'Malik@5676',
+#         'HOST': '212.38.94.126',
+#         'PORT': '3306',
+#     }
+# }
 
 
 # Password validation

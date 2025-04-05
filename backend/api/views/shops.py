@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .auth import token_validator
-from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail
+from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,User
 from api.serializers import shop_serializer
 from django.db import transaction
 from django.db.models import Q
@@ -20,6 +20,56 @@ def get_all_shops(request):
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(["POST"])
+@token_validator
+def add_shop(request):
+    try:
+        if str(request.current_user.role).strip().lower()!="admin":
+            return Response({"status":0,'message':"Only Admin can add shop"},status=status.HTTP_400_BAD_REQUEST)
+        data=request.data
+        name=data.get('name',None)
+        address=data.get('address',None)
+        contact_number=data.get('contact_number',None)
+        if not name or len(name)<3:
+            return Response({"status":0,'message':"Please enter valid shop name"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            shop=Shop(name=name,address=address,contact_number=contact_number)
+            shop.save()
+        return Response({"status":1,'message':"Shop added successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def add_bank_account(request):
+    try:
+        data=request.data
+        shop_pk=data.get('shop_pk',0)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin" and request.current_user.shop != current_shop:
+            return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        bank_name=data.get('bank_name',None)
+        account_name=data.get('account_name',None)
+        account_number=data.get('account_number',None)
+        balance=data.get('balance',0.00)
+        ifsc_code=data.get('ifsc_code',None)
+        if not bank_name or len(bank_name)<3:
+            return Response({"status":0,'message':"Please enter valid bank name"},status=status.HTTP_400_BAD_REQUEST)
+        if not account_name or len(account_name)<3:
+            return Response({"status":0,'message':"Please enter valid account name"},status=status.HTTP_400_BAD_REQUEST)
+        if not account_number or len(account_number)<10:
+            return Response({"status":0,'message':"Please enter valid account number"},status=status.HTTP_400_BAD_REQUEST)
+        
+        with transaction.atomic():
+            bank_account=BankAccount(shop=current_shop,bank_name=bank_name,account_name=account_name,account_number=account_number,ifsc_code=ifsc_code,balance=balance)
+            bank_account.save()
+        return Response({"status":1,'message':"Bank account added successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["GET"])
 @token_validator
 def get_shop_detail(request):
@@ -217,7 +267,7 @@ def get_transactions(request):
         if str(request.current_user.role).strip().lower()!="admin":
             if request.current_user.shop != current_shop:
                 return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
-        all_transactions=Transaction.objects.filter(shop=current_shop)
+        all_transactions=Transaction.objects.filter(shop=current_shop).order_by('-id')
         if search:
             search_query=search.split()
             q_objects=Q()
@@ -242,7 +292,7 @@ def get_transactions(request):
         return Response({"status":1,'transactions':serialized_transacitons,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 
 
@@ -282,5 +332,114 @@ def get_transaction_types(request):
     try:
         transaction_types=list(TransactionType.objects.all().values())
         return Response({"status":1,'data':transaction_types},status=status.HTTP_200_OK) 
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def deposit_balance(request):
+    try:
+        data=request.data
+        shop_pk=data.get('shop_pk',0)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin" and request.current_user.shop != current_shop :
+                return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        cash_denomination=data.get('cash_denomination',[])
+        payment_details=data.get('payment_details',[])
+        if not cash_denomination and not payment_details:
+            return Response({"status":0,'message':"cash_denomination or payment_details is required"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            deposit_withdraw_history=DepositWithdrawHistory(
+                shop=current_shop,
+                type="deposit",
+                created_by=request.current_user
+            )
+            deposit_withdraw_history.save()
+            if cash_denomination:
+                for cash in cash_denomination:
+                    cash_pk=cash.get('cash_pk',0)
+                    quantity=cash.get('quantity',0)
+                    if quantity<=0:
+                        raise Exception("quantity should be greater than 0 in cash_denomination")
+                    current_cash_object=ShopCash.objects.filter(pk=cash_pk).first()
+                    if not current_cash_object:
+                        raise Exception(f"invalid cash_pk =>  {cash_pk}  in cash_denomination")
+                    cash_denomination_object=DepositWithdrawHistoryCashDenomination(
+                        deposit_withdraw_history=deposit_withdraw_history,
+                        currency=current_cash_object.currency,
+                        quantity=quantity
+                    )
+                    cash_denomination_object.save()
+                    current_cash_object.quantity+=quantity
+                    current_cash_object.save()
+            if payment_details:
+                for payment in payment_details:
+                    bank_account_pk=payment.get('bank_account_pk',0)
+                    amount=payment.get('amount',0)
+                    if amount<=0:
+                        raise Exception("amount should be greater than 0 in payment_details")
+                    current_bank_account=BankAccount.objects.filter(pk=bank_account_pk).first()
+                    if not current_bank_account:
+                        raise Exception( f"invalid bank_account_pk =>  {bank_account_pk}  in payment_details")
+                    if current_bank_account.shop != current_shop:
+                        raise Exception(f"bank_account_pk =>  {bank_account_pk} does not belong to this shop")
+                    payment_detail_object=DepositWithdrawHistoryPaymentDetail(
+                        deposit_withdraw_history=deposit_withdraw_history,
+                        bank_account=current_bank_account,
+                        amount=amount
+                        )
+                    payment_detail_object.save()
+                    current_bank_account.balance+=amount
+                    current_bank_account.save()
+        return Response({"status":1,'message':"Balance deposited successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def withdraw_balance(request):
+    try:
+        data=request.data
+        shop_pk=data.get('shop_pk',0)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin" and request.current_user.shop != current_shop :
+                return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        cash_denomination=data.get('cash_denomination',[])
+        payment_details=data.get('payment_details',[])
+        if not cash_denomination and not payment_details:
+            return Response({"status":0,'message':"cash_denomination or payment_details is required"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            deposit_withdraw_history=DepositWithdrawHistory(
+                shop=current_shop,
+                type="withdraw",
+                created_by=request.current_user
+            )
+            deposit_withdraw_history.save()
+            if cash_denomination:
+                for denomination in cash_denomination:
+                    pass
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+@api_view(["GET"])
+@token_validator
+def get_shop_users(request):
+    try:
+        data=request.GET
+        shop_pk=data.get('shop_pk',0)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin":
+            return Response({"status":0,'message':"only admin can access this data"},status=status.HTTP_400_BAD_REQUEST)
+        users=User.objects.filter(shop=current_shop).exclude(role="Admin")
+        return Response({"status":1,'data':list(users.values())},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
