@@ -392,7 +392,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                         <td className="text-nowrap">{totalCash ? `₹ ${totalCash}` : '-'}</td>
                                         <td className="text-nowrap">{totalBank ? `₹ ${totalBank}` : '-'}</td>
                                         <td className="text-nowrap">
-                                            {txn.created_by}
+                                            {txn?.created_by?.name}
                                         </td>
                                         <td>{txn.remark || "-"}</td>
 

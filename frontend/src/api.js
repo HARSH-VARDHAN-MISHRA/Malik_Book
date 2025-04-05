@@ -24,8 +24,8 @@ export const GET_SHOP_USERS = `${PREFIX_URL}/get-shop-users/`;
 export const ADD_SHOP = `${PREFIX_URL}/add-shop/`;
 export const ADD_BANK_ACCOUNT = `${PREFIX_URL}/add-bank-account/`;
 
-export const DEPOSIT_SHOP_MONEY = `${PREFIX_URL}/deposit-shop-money/`;
-export const WITHDRAW_SHOP_MONEY = `${PREFIX_URL}/withdraw-shop-money/`;
+export const DEPOSIT_BALANCE = `${PREFIX_URL}/deposit-balance/`;
+export const WITHDRAW_BALANCE = `${PREFIX_URL}/withdraw-balance/`;
 
 // Users
 export const ADD_USER = `${PREFIX_URL}/add-user/`;

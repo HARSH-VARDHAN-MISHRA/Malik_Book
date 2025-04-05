@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { DEPOSIT_SHOP_MONEY } from "../../../api";
+import { DEPOSIT_BALANCE } from "../../../api";
 
 const DepositMoney = ({ open, handleClose, shopPk, balance, fetchShopDetail, fetchData }) => {
 
@@ -76,7 +76,7 @@ const DepositMoney = ({ open, handleClose, shopPk, balance, fetchShopDetail, fet
 
         setLoading(true);
         try {
-            const res = await axios.post(DEPOSIT_SHOP_MONEY, payload, {
+            const res = await axios.post(DEPOSIT_BALANCE, payload, {
                 headers: { Authorization: userDetails.token },
             });
 
