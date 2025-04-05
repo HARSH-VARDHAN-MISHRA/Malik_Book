@@ -6,6 +6,8 @@ import { GET_SHOP_USERS, DELETE_USER, UPDATE_USER, ADD_USER } from "../../../api
 
 const ShopUsers = ({ open, handleClose, shopPk }) => {
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -64,7 +66,9 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
         });
     };
 
-    const handleUpdateSubmit = () => {
+    const handleUpdateSubmit = (e) => {
+        e.preventDefault();
+        setSubmitLoading(true);
         const data = {
             user_pk: editingUser.id,
             ...editForm
@@ -79,10 +83,13 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 setEditingUser(null);
                 fetchData();
             })
-            .catch((err) => toast.error(err?.response?.data?.message || "Update failed"));
+            .catch((err) => toast.error(err?.response?.data?.message || "Update failed"))
+            .finally(() => setSubmitLoading(false));
     };
 
-    const handleAddUser = () => {
+    const handleAddUser = (e) => {
+        e.preventDefault();
+        setSubmitLoading(true);
         const data = {
             shop_pk: shopPk,
             ...addForm,
@@ -98,10 +105,12 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 setAddForm({ name: "", email: "", password: "", is_active: true });
                 fetchData();
             })
-            .catch((err) => toast.error(err?.response?.data?.message || "Failed to add user"));
+            .catch((err) => toast.error(err?.response?.data?.message || "Failed to add user"))
+            .finally(() => setSubmitLoading(false));
     };
 
     const handleDeleteUser = () => {
+        setDeleteLoading(true);
         const data = { user_pk: deleteUserId };
         axios
             .post(`${DELETE_USER}`, data, {
@@ -112,7 +121,8 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 setDeleteUserId(null);
                 fetchData();
             })
-            .catch((err) => toast.error(err?.response?.data?.message || "Error deleting user"));
+            .catch((err) => toast.error(err?.response?.data?.message || "Error deleting user"))
+            .finally(() => setDeleteLoading(false));
     };
 
     const filteredUsers = users.filter((user) =>
@@ -136,8 +146,8 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <Button variant="success" className="text-nowrap" onClick={() => setAddModalOpen(true)}>
-                            + Add 
+                        <Button variant="primary" className="text-nowrap" onClick={() => setAddModalOpen(true)}>
+                            + Add
                         </Button>
                     </div>
 
@@ -211,35 +221,38 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 <Modal.Header closeButton>
                     <Modal.Title>Edit User</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <Form>
+                <Form onSubmit={handleUpdateSubmit}>
+                    <Modal.Body>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
-                            <Form.Control type="text" value={editForm.name}
+                            <Form.Control type="text" value={editForm.name} autoFocus required
                                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" value={editForm.email}
+                            <Form.Control type="email" value={editForm.email} required
                                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type="text" value={editForm.password}
+                            <Form.Control type="text" value={editForm.password} required
                                 onChange={(e) => setEditForm({ ...editForm, password: e.target.value })} />
                         </Form.Group>
                         <Form.Check
                             type="checkbox"
+                            id="edit-active"
                             label="Active"
                             checked={editForm.is_active}
                             onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
                         />
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setEditingUser(null)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleUpdateSubmit}>Save Changes</Button>
-                </Modal.Footer>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setEditingUser(null)}>Cancel</Button>
+                        <Button type="submit" variant="primary" disabled={submitLoading}>
+                            {submitLoading ? <Spinner size="sm" animation="border" /> : "Save Changes"}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
             </Modal>
 
             {/* Add User Modal */}
@@ -247,35 +260,38 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 <Modal.Header closeButton>
                     <Modal.Title>Add New User</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <Form>
+                <Form onSubmit={handleAddUser}>
+                    <Modal.Body>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
-                            <Form.Control type="text" value={addForm.name}
+                            <Form.Control type="text" value={addForm.name} autoFocus required
                                 onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" value={addForm.email}
+                            <Form.Control type="email" value={addForm.email} required
                                 onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type="text" value={addForm.password}
+                            <Form.Control type="text" value={addForm.password} required
                                 onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} />
                         </Form.Group>
                         <Form.Check
                             type="checkbox"
+                            id="add-active"
                             label="Active"
                             checked={addForm.is_active}
                             onChange={(e) => setAddForm({ ...addForm, is_active: e.target.checked })}
                         />
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setAddModalOpen(false)}>Cancel</Button>
-                    <Button variant="success" onClick={handleAddUser}>Add User</Button>
-                </Modal.Footer>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setAddModalOpen(false)}>Cancel</Button>
+                        <Button type="submit" variant="success" disabled={submitLoading}>
+                            {submitLoading ? <Spinner size="sm" animation="border" /> : "Add User"}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
             </Modal>
 
             {/* Delete Confirmation Modal */}
@@ -288,7 +304,9 @@ const ShopUsers = ({ open, handleClose, shopPk }) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setDeleteUserId(null)}>Cancel</Button>
-                    <Button variant="danger" onClick={handleDeleteUser}>Delete</Button>
+                    <Button variant="danger" onClick={handleDeleteUser} disabled={deleteLoading}>
+                        {deleteLoading ? <Spinner size="sm" animation="border" /> : "Delete"}
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
