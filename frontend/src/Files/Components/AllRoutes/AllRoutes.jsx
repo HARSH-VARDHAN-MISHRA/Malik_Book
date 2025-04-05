@@ -10,6 +10,7 @@ import AddProduct from "../../Pages/Products/AddProduct";
 import AllCustomer from "../../Pages/Customer/AllCustomer";
 import ShopDetail from "../../Pages/Shop/ShopDetail";
 import { UseScreenWidth } from "../Utils/UseScreenWidth";
+import ShopDepositWithdrawHistory from "../../Pages/Shop/ShopDepositWithdrawHistory";
 
 function AllRoutes() {
   const isWideScreen = UseScreenWidth();
@@ -116,13 +117,13 @@ function AllRoutes() {
                 }
               />
               <Route
-                path="/shop-deposit-and-withdraw-history/:id"
+                path="/shop-balance-history/:id"
                 element={
                   <>
-                    <Helmet> ShopDepositWithdrawHistory
+                    <Helmet> 
                       <title>Shop Deposit & Withdraw History - Account Mangement</title>{" "}
                     </Helmet>
-                    <ShopDetail />
+                    <ShopDepositWithdrawHistory />
                   </>
                 }
               />

@@ -52,7 +52,7 @@ const ShopDetail = () => {
         <>
             {loading && <Loader message={loadingMsg} />}
 
-
+        <div className="d-flex align-items-center justify-content-between gap-1">
             <nav>
                 <ol className="breadcrumb">
                     <li className="breadcrumb-item">
@@ -76,6 +76,14 @@ const ShopDetail = () => {
                     </li>
                 </ol>
             </nav>
+            <button className="btn btn-primary mb-2" 
+                onClick={() => navigate(`/shop-balance-history/${id}`)}
+            >
+                <i class="fa-solid fa-clock-rotate-left"></i> Balance History 
+            </button>
+
+        </div>
+
 
             {/* Shop Details Section */}
             {shop && (

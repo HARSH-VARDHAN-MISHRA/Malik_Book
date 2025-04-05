@@ -13,6 +13,7 @@ import AddBankAccount from "./AddBankAccount";
 import ShopUsers from "./ShopUsers";
 import DepositMoney from "../Transactions/DepositMoney";
 import WithdrawMoney from "../Transactions/WithdrawMoney";
+import FilterByShopUsers from "../../Components/FilterModals/FilterByShopUsers";
 
 const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
@@ -69,6 +70,13 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
     const handleCustomerSelection = (selectedIds) => {
         setSelectedCustomers(selectedIds);
     };
+    // Shop User Filter
+    const [selectedShopUsers, setSelectedShopUsers] = useState([]);
+
+    const handleShopUsersSelection = (selectedIds) => {
+        setSelectedShopUsers(selectedIds);
+    };
+
 
 
     // Fetch customers data based on pagination and search
@@ -79,6 +87,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
             search: query,
             page_number: page,
             page_size: pageSize,
+            selected_user_pks: selectedShopUsers || [],
             selected_customer_pks: selectedCustomers || [],
             selected_transaction_type: selectedTransactionType || "",  // pay or recieve or leave it blank
             starting_date: startDate || "",
@@ -106,7 +115,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedTransactionType, id]);
+    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedTransactionType, selectedCustomers, selectedShopUsers, id]);
 
 
 
@@ -285,7 +294,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
                             <button className="btn btn-success"
                                 onClick={() => handleOpenDepositMoneyModal()}
-                                >
+                            >
                                 Deposit
                             </button>
                             <button className="btn btn-danger"
@@ -342,7 +351,13 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                             </th>
                             <th>Cash</th>
                             <th>Bank</th>
-                            <th>Created By</th>
+                            <th>
+                                <FilterByShopUsers
+                                    selectedShopUsers={selectedShopUsers}
+                                    onSelect={handleShopUsersSelection}
+                                    id={id}
+                                />
+                            </th>
                             <th>Remark</th>
                         </tr>
                     </thead>
@@ -368,7 +383,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                     <tr key={txn.id}>
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                         <td className="text-nowrap">
-                                        {new Date(txn.date).toLocaleString('en-US', {
+                                            {new Date(txn.date).toLocaleString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric',

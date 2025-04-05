@@ -50,5 +50,6 @@ export const GET_BANK_ACCOUNTS = `${PREFIX_URL}/get-bank-accounts/`;
 export const MAKE_PAYMENT = `${PREFIX_URL}/make-payment/`;
 export const RECEIVE_PAYMENT = `${PREFIX_URL}/receive-payment/`;
 export const GET_TRANSACTIONS = `${PREFIX_URL}/get-transactions/`;
+export const GET_DEPOSIT_AND_WITHDRAW_HISTORY = `${PREFIX_URL}/get-deposit-and-withdraw-history/`;
 
 
