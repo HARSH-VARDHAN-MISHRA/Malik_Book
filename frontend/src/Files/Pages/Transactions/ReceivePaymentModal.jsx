@@ -173,39 +173,39 @@ const ReceivePaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDeta
                             <h6 className="mt-2">Cash Balances:</h6>
                             {balance.cash.length > 0 ? (
                                 <ul className="list-group mb-3">
-                                     <div style={{ height: "40dvh", overflow: "auto" }}>
-                {balance.cash.map((cash) => {
-                    const inputQty = Number(cashInputs[cash.id]) || 0;
-                    const totalForThisCash = inputQty * cash.currency;
+                                    <div style={{ height: "40dvh", overflow: "auto" }}>
+                                        {balance.cash.map((cash) => {
+                                            const inputQty = Number(cashInputs[cash.id]) || 0;
+                                            const totalForThisCash = inputQty * cash.currency;
 
-                    return (
-                        <li
-                            className="list-group-item d-flex justify-content-between align-items-center"
-                            key={cash.id}
-                        >
-                            <div className="w-75">
-                                ₹{cash.currency}
-                                {inputQty > 0 && (
-                                    <div className="text-success small">
-                                        ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
+                                            return (
+                                                <li
+                                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                                    key={cash.id}
+                                                >
+                                                    <div className="w-75">
+                                                        ₹{cash.currency}
+                                                        {inputQty > 0 && (
+                                                            <div className="text-success small">
+                                                                ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <Form.Control
+                                                        type="number"
+                                                        min="0"
+                                                        placeholder="Qty"
+                                                        value={cashInputs[cash.id] ?? ""}
+                                                        onChange={(e) =>
+                                                            handleCashChange(cash.id, e.target.value, cash.quantity)
+                                                        }
+                                                        style={{ width: 100 }}
+                                                        disabled={loading}
+                                                    />
+                                                </li>
+                                            );
+                                        })}
                                     </div>
-                                )}
-                            </div>
-                            <Form.Control
-                                type="number"
-                                min="0"
-                                placeholder="Qty"
-                                value={cashInputs[cash.id] ?? ""}
-                                onChange={(e) =>
-                                    handleCashChange(cash.id, e.target.value, cash.quantity)
-                                }
-                                style={{ width: 100 }}
-                                disabled={loading}
-                            />
-                        </li>
-                    );
-                })}
-            </div>
                                     <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
                                         <span>Total Cash:</span>
                                         <span>₹{totalCash.toLocaleString()}</span>

@@ -39,7 +39,7 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                 value: cust.id,
                 label: `${cust.name} (${cust.phone})`,
             }));
-            
+
 
             // return res.data.data.map((cust) => ({
             //     value: cust.id,
@@ -173,12 +173,12 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
                                 <div>
                                     <div className="fw-medium small">{option.name} ({option.phone})</div>
                                     <div className="small ">
-                                    {option.address && (
-                                        <span>
-                                            {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
-                                        </span>
-                                    )}
-                                        <i className="fas fa-money-bill-wave me-1"></i> 
+                                        {option.address && (
+                                            <span>
+                                                {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
+                                            </span>
+                                        )}
+                                        <i className="fas fa-money-bill-wave me-1"></i>
                                         Paid: ₹{option.total_paid_amount.toLocaleString()} |
                                         Received: ₹{option.total_received_amount.toLocaleString()}
                                     </div>

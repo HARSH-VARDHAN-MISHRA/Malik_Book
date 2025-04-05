@@ -83,7 +83,7 @@ const ShopDetail = () => {
                     <div className="row">
                         {/* Left Section: Shop Details */}
                         <div className="col-md-3">
-                            <div className="card" style={{maxHeight:"80vh",overflow:"auto"}}>
+                            <div className="card">
                                 <div className="card-body">
                                     <h5 className="card-title">{shop.name}</h5>
                                     <p className="card-text">
@@ -93,63 +93,70 @@ const ShopDetail = () => {
                                         <strong>Contact:</strong> {shop.contact_number || "N/A"}
                                     </p>
 
-                                    {/* Bank Balances */}
-                                    <h6 className="mt-2">Bank Balances:</h6>
-                                    {shop.current_balance.bank_balance.length > 0 ? (
-                                        <ul className="list-group mb-2">
-                                            {shop.current_balance.bank_balance.map((bank) => (
-                                                <li className="list-group-item" key={bank.id}>
-                                                    <div className="fw-medium">{bank.bank_name}</div>
-                                                    <div className="small text-muted">
-                                                        A/C: {bank.account_number} <br />
-                                                        Name: {bank.account_name} <br />
-                                                        IFSC: {bank.ifsc_code}
-                                                    </div>
-                                                    <div className="d-flex justify-content-between mt-1">
-                                                        <span className="text-secondary">Balance:</span>
-                                                        <strong>₹{bank.balance.toLocaleString()}</strong>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                            <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
-                                                <span>Total Bank Balance:</span>
-                                                <span>
-                                                    ₹
-                                                    {shop.current_balance.bank_balance
-                                                        .reduce((sum, bank) => sum + bank.balance, 0)
-                                                        .toLocaleString()}
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    ) : (
-                                        <p className="text-muted">No bank balance available.</p>
-                                    )}
+                                    <div  style={{maxHeight:"67vh",overflow:"auto"}}>
 
-                                    {/* Cash Balances */}
-                                    <h6>Cash Balances:</h6>
-                                    {shop.current_balance.cash.length > 0 ? (
-                                        <ul className="list-group mb-2">
-                                            {shop.current_balance.cash.map((cash) => (
-                                                <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                        {/* Bank Balances */}
+                                        <h6 className="mt-2">Bank Balances:</h6>
+                                        {shop.current_balance.bank_balance.length > 0 ? (
+                                            <ul className="list-group mb-2">
+                                                {shop.current_balance.bank_balance.map((bank) => (
+                                                    <li className="list-group-item" key={bank.id}>
+                                                        <div className="fw-medium">{bank.bank_name}</div>
+                                                        <div className="small text-muted">
+                                                            A/C: {bank.account_number} <br />
+                                                            Name: {bank.account_name} <br />
+                                                            IFSC: {bank.ifsc_code}
+                                                        </div>
+                                                        <div className="d-flex justify-content-between mt-1">
+                                                            <span className="text-secondary">Balance:</span>
+                                                            <strong>₹{bank.balance.toLocaleString()}</strong>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                                    <span>Total Bank Balance:</span>
                                                     <span>
-                                                        ₹{cash.currency} x {cash.quantity}
+                                                        ₹
+                                                        {shop.current_balance.bank_balance
+                                                            .reduce((sum, bank) => sum + bank.balance, 0)
+                                                            .toLocaleString()}
                                                     </span>
-                                                    <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
                                                 </li>
-                                            ))}
-                                            <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
-                                                <span>Total Cash Balance:</span>
-                                                <span>
-                                                    ₹
-                                                    {shop.current_balance.cash
-                                                        .reduce((sum, cash) => sum + cash.currency * cash.quantity, 0)
-                                                        .toLocaleString()}
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    ) : (
-                                        <p className="text-muted">No cash available.</p>
-                                    )}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-muted">No bank balance available.</p>
+                                        )}
+
+                                        {/* Cash Balances */}
+                                        <h6>Cash Balances:</h6>
+                                        {shop.current_balance.cash.length > 0 ? (
+                                            <ul className="list-group mb-2">
+                                                {shop.current_balance.cash.map((cash) => (
+                                                    <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                                        <span>
+                                                            ₹{cash.currency} x {cash.quantity}
+                                                        </span>
+                                                        <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
+                                                    </li>
+                                                ))}
+                                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                                    <span>Total Cash Balance:</span>
+                                                    <span>
+                                                        ₹
+                                                        {shop.current_balance.cash
+                                                            .reduce((sum, cash) => sum + cash.currency * cash.quantity, 0)
+                                                            .toLocaleString()}
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        ) : (
+                                            <p className="text-muted">No cash available.</p>
+                                        )}
+
+                                    </div>
+
+
+
 
                                     {/* Grand Total */}
                                     <li className=" d-flex justify-content-between fs-5 text-danger fw-medium  mt-2">
