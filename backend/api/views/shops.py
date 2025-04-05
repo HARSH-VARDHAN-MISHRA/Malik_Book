@@ -261,6 +261,7 @@ def get_transactions(request):
         selected_transaction_type=data.get('selected_transaction_type',[])
         starting_date=data.get('starting_date',None)
         ending_date=data.get('ending_date',None)
+        selected_user_pks=data.get('selected_user_pks',[])
         current_shop=Shop.objects.filter(pk=shop_pk).first()
         if not current_shop:
             return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
@@ -272,7 +273,7 @@ def get_transactions(request):
             search_query=search.split()
             q_objects=Q()
             for query in search_query:
-                q_objects &= Q(transaction_id__icontains=query) | Q(customer__name__icontains=query) | Q(customer__phone__icontains=query) | Q(customer__address__icontains=query) | Q(customer__email__icontains=query)  | Q(remark__icontains=query)
+                q_objects &= Q(customer__name__icontains=query) | Q(customer__phone__icontains=query) | Q(customer__address__icontains=query) | Q(customer__email__icontains=query)  | Q(remark__icontains=query)
             all_transactions=all_transactions.filter(q_objects)
         total_rows=all_transactions.count()
         total_pages=math.ceil(total_rows/page_size)
@@ -287,9 +288,56 @@ def get_transactions(request):
                 all_transactions=all_transactions.filter(date__icontains=starting_date)
             else:
                 all_transactions=all_transactions.filter(date__range=[starting_date,ending_date])
+        if selected_user_pks:
+            all_transactions=all_transactions.filter(created_by__pk__in=selected_user_pks)
                 
         serialized_transacitons=shop_serializer.TransactionSerializer(all_transactions[starting:ending],many=True).data
         return Response({"status":1,'transactions':serialized_transacitons,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def get_deposit_and_withdraw_history(request):
+    try:
+        data=request.data
+        search=data.get('search',None)
+        page_number=data.get('page_number',1)
+        page_size=data.get('page_size',25)
+        shop_pk=data.get('shop_pk',0)
+        selected_type=data.get('selected_type',[])
+        starting_date=data.get('starting_date',None)
+        ending_date=data.get('ending_date',None)
+        selected_user_pks=data.get('selected_user_pks',[])
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin" and request.current_user.shop != current_shop:
+            return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        all_history=DepositWithdrawHistory.objects.filter(shop=current_shop).order_by('-id')
+        if search:
+            search_query=search.split()
+            q_objects=Q()
+            for query in search_query:
+                q_objects &= Q(remark__icontains=query) 
+            all_history=all_history.filter(q_objects)
+        total_rows=all_history.count()
+        total_pages=math.ceil(total_rows/page_size)
+        starting=(page_number-1)*page_size
+        ending=starting+page_size
+
+        if selected_type:
+            all_history=all_history.filter(type__icontains=selected_type)
+        if starting_date and ending_date:
+            if starting_date == ending_date:
+                all_history=all.filter(date__icontains=starting_date)
+            else:
+                all_history=all_history.filter(date__range=[starting_date,ending_date])
+        if selected_user_pks:
+            all_history=all_history.filter(created_by__pk__in=selected_user_pks)
+                
+        serialized_history=shop_serializer.DepositAndWithdrawHistorySerializer(all_history[starting:ending],many=True).data
+        return Response({"status":1,'data':serialized_history,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
 
@@ -341,6 +389,7 @@ def deposit_balance(request):
     try:
         data=request.data
         shop_pk=data.get('shop_pk',0)
+        remark=data.get('remark','')
         current_shop=Shop.objects.filter(pk=shop_pk).first()
         if not current_shop:
             return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
@@ -354,7 +403,8 @@ def deposit_balance(request):
             deposit_withdraw_history=DepositWithdrawHistory(
                 shop=current_shop,
                 type="deposit",
-                created_by=request.current_user
+                created_by=request.current_user,
+                remark=remark
             )
             deposit_withdraw_history.save()
             if cash_denomination:
@@ -403,6 +453,7 @@ def withdraw_balance(request):
     try:
         data=request.data
         shop_pk=data.get('shop_pk',0)
+        remark=data.get('remark','')
         current_shop=Shop.objects.filter(pk=shop_pk).first()
         if not current_shop:
             return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
@@ -416,12 +467,49 @@ def withdraw_balance(request):
             deposit_withdraw_history=DepositWithdrawHistory(
                 shop=current_shop,
                 type="withdraw",
-                created_by=request.current_user
+                created_by=request.current_user,
+                remark=remark
             )
             deposit_withdraw_history.save()
-            if cash_denomination:
-                for denomination in cash_denomination:
-                    pass
+            for cash in cash_denomination:
+                cash_pk=cash.get('cash_pk',0)
+                quantity=cash.get('quantity',0)
+                if quantity<=0:
+                    raise Exception("quantity should be greater than 0 in cash_denomination")
+                current_cash_object=ShopCash.objects.filter(pk=cash_pk).first()
+                if not current_cash_object:
+                    raise Exception(f"invalid cash_pk =>  {cash_pk}  in cash_denomination")
+                if current_cash_object.quantity <quantity:
+                    raise Exception(f"not enough quantity of cash =>  {cash_pk}  in cash_denomination")
+                cash_denomination_object=DepositWithdrawHistoryCashDenomination(
+                    deposit_withdraw_history=deposit_withdraw_history,
+                    currency=current_cash_object.currency,
+                    quantity=quantity
+                )
+                cash_denomination_object.save()
+                current_cash_object.quantity-=quantity
+                current_cash_object.save()
+            for payment in payment_details:
+                bank_account_pk=payment.get('bank_account_pk',0)
+                amount=payment.get('amount',0)
+                if amount<=0:
+                    raise Exception("amount should be greater than 0 in payment_details")
+                current_bank_account=BankAccount.objects.filter(pk=bank_account_pk).first()
+                if not current_bank_account:
+                    raise Exception( f"invalid bank_account_pk =>  {bank_account_pk}  in payment_details")
+                if current_bank_account.shop != current_shop:
+                    raise Exception(f"bank_account_pk =>  {bank_account_pk} does not belong to this shop")
+                if current_bank_account.balance < amount:
+                    raise Exception(f"not enough balance in bank_account_pk =>  {bank_account_pk} in payment_details")
+                payment_detail_object=DepositWithdrawHistoryPaymentDetail(
+                    deposit_withdraw_history=deposit_withdraw_history,
+                    bank_account=current_bank_account,
+                    amount=amount
+                    )
+                payment_detail_object.save()
+                current_bank_account.balance-=amount
+                current_bank_account.save()
+        return Response({"status":1,'message':"withdrawal successful"},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
     

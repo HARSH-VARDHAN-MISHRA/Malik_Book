@@ -86,28 +86,28 @@ WSGI_APPLICATION = 'malik_book.wsgi.application'
 
 
 # local database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'malik_book',
-        'USER': 'malik',
-        'PASSWORD': 'Malik5676',
-        'HOST': 'localhost',
-        'PORT': '3307',
-    }
-}
-
-# live database 
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'malik_book',
 #         'USER': 'malik',
-#         'PASSWORD': 'Malik@5676',
-#         'HOST': '212.38.94.126',
-#         'PORT': '3306',
+#         'PASSWORD': 'Malik5676',
+#         'HOST': 'localhost',
+#         'PORT': '3307',
 #     }
 # }
+
+# live database 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'malik_book',
+        'USER': 'malik',
+        'PASSWORD': 'Malik@5676',
+        'HOST': '212.38.94.126',
+        'PORT': '3306',
+    }
+}
 
 
 # Password validation

@@ -19,6 +19,10 @@ urlpatterns = [
     path('add-bank-account/',shops.add_bank_account),
     path('get-shop-users/',shops.get_shop_users),
 
+    path('deposit-balance/',shops.deposit_balance),
+    path('withdraw-balance/',shops.withdraw_balance),
+    path('get-deposit-and-withdraw-history/',shops.get_deposit_and_withdraw_history),
+
 
     # customers
     path('add-customer/',customers.add_customer),
