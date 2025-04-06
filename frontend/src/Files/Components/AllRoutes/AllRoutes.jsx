@@ -17,6 +17,8 @@ function AllRoutes() {
   const [sidetoggle, setSideToggle] = useState(isWideScreen);
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null means not checked yet
 
+  const [walletContent, setWalletContent] = useState(null);
+
   const handleSidebarToggle = () => {
     setSideToggle(!sidetoggle);
   };
@@ -49,7 +51,7 @@ function AllRoutes() {
         </Routes>
       ) : (
         <>
-          <Sidebar sidetoggle={sidetoggle} onToggle={handleSidebarToggle} />
+          <Sidebar sidetoggle={sidetoggle} onToggle={handleSidebarToggle} walletContent={walletContent}  />
 
           <div className={`main-content ${sidetoggle ? "" : "active"}`}>
             <Routes>
@@ -112,7 +114,7 @@ function AllRoutes() {
                     <Helmet>
                       <title>Shop Detail - Account Mangement</title>{" "}
                     </Helmet>
-                    <ShopDetail />
+                    <ShopDetail setWalletContent={setWalletContent} />
                   </>
                 }
               />

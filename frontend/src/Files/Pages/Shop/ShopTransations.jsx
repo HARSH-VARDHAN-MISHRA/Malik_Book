@@ -15,7 +15,7 @@ import DepositMoney from "../Transactions/DepositMoney";
 import WithdrawMoney from "../Transactions/WithdrawMoney";
 import FilterByShopUsers from "../../Components/FilterModals/FilterByShopUsers";
 
-const ShopTransations = ({ id, balance, fetchShopDetail }) => {
+const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => {
 
     const [loading, setLoading] = useState(true);
     const [transactions, setTransactions] = useState([]);
@@ -188,6 +188,77 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
 
 
 
+    // Wallet 
+    const [showWallet, setShowWallet] = useState(false);
+    // Calculate totals
+    const totalCash = balance?.cash?.reduce((sum, item) => sum + item.currency * item.quantity, 0) || 0;
+    const totalBank = balance?.bank_balance?.reduce((sum, item) => sum + item.balance, 0) || 0;
+    const totalBalance = totalCash + totalBank;
+
+
+
+
+  useEffect(() => {
+    const walletUI = (
+      <div className="wallet-container px-2" style={{ position: "relative" , zIndex: 10 }}>
+        <button
+          className="btn btn-success w-100 d-flex align-items-center justify-content-between"
+          onClick={() => setShowWallet(prev => !prev)}
+        >
+          <i className="fa-solid fa-wallet me-1"></i>
+          ₹ {totalBalance.toLocaleString()}
+          <i className={` ms-2 fa fa-chevron-${showWallet ? "up" : "down"}`}></i>
+        </button>
+
+        {showWallet && (
+          <div
+            className="wallet-dropdown bg-white shadow rounded p-3 mt-2"
+            style={{
+              position: "absolute",
+              top: "100%",
+              right: 0,
+              width: "200%",
+              maxWidth:"300px",
+              zIndex: 9999, // zIndex within its own context
+            }}
+          >
+            {/* <h6 className="text-primary fw-bold mb-2">Wallet Summary</h6> */}
+            <div className="mb-2">
+              <div><strong>Cash Balance:</strong> ₹ {totalCash.toLocaleString()}</div>
+              <div><strong>Bank Balance:</strong> ₹ {totalBank.toLocaleString()}</div>
+              <hr />
+            </div>
+
+            {userDetails.role?.toLowerCase() === "admin" && (
+              <div className="d-grid gap-2 mb-2">
+                <button className="btn btn-primary" onClick={() => setOpenShopUsersModal(true)}>
+                  <i className="fa-solid fa-users me-1"></i> Users
+                </button>
+                <button className="btn btn-primary" onClick={handleOpenAddBankAccountModal}>
+                  <i className="fa-solid fa-building-columns me-1"></i> Add Bank Account
+                </button>
+              </div>
+            )}
+
+            <div className="d-grid gap-2">
+              <button className="btn btn-success" onClick={handleOpenDepositMoneyModal}>
+                <i className="fa-solid fa-arrow-down me-1"></i> Deposit
+              </button>
+              <button className="btn btn-danger" onClick={handleOpenWithdrawMoneyModal}>
+                <i className="fa-solid fa-arrow-up me-1"></i> Withdraw
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+
+    if (setWalletContent) {
+      setWalletContent(walletUI);
+    }
+  }, [showWallet, totalBalance, totalCash, totalBank]);
+
+
 
 
     return (
@@ -277,7 +348,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                     <div className="col-xl-8 ">
                         <div className="top-content-btns mt-1 mt-md-0">
 
-                            {userDetails.role?.toLowerCase() === "admin" ? (
+                            {/* {userDetails.role?.toLowerCase() === "admin" ? (
                                 <>
                                     <button className="btn btn-primary" onClick={() => setOpenShopUsersModal(true)}>
                                         <i className="fa-solid fa-users"></i> Users
@@ -289,10 +360,10 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                         <i class="fa-solid fa-building-columns"></i> Add Bank Account
                                     </button>
                                 </>
-                            ) : null}
+                            ) : null} */}
 
 
-                            <button className="btn btn-success"
+                            {/* <button className="btn btn-success"
                                 onClick={() => handleOpenDepositMoneyModal()}
                             >
                                 Deposit
@@ -301,7 +372,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail }) => {
                                 onClick={() => handleOpenWithdrawMoneyModal()}
                             >
                                 Withdraw
-                            </button>
+                            </button> */}
 
                             <button className="btn btn-secondary"
                                 onClick={() => handleOpenMakePaymentModal()}

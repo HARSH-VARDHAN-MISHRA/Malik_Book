@@ -6,7 +6,7 @@ import Loader from "../../Components/Loader/Loader";
 import toast from "react-hot-toast";
 import ShopTransations from "./ShopTransations";
 
-const ShopDetail = () => {
+const ShopDetail = ({ setWalletContent }) => {
     const { id } = useParams(); // Extract the shop ID from URL
     const navigate = useNavigate();
     const [shop, setShop] = useState(null);
@@ -183,7 +183,7 @@ const ShopDetail = () => {
 
                         {shop && (
                             <div className="col-md-9 mt-4 mt-md-0">
-                                <ShopTransations id={id} balance={shop.current_balance} fetchShopDetail={fetchData} />
+                                <ShopTransations id={id} balance={shop.current_balance} fetchShopDetail={fetchData} setWalletContent={setWalletContent} />
                             </div>
                         )}
                     </div>

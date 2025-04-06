@@ -166,7 +166,6 @@ const ShopDepositWithdrawHistory = () => {
                             <th>Amount</th>
                             <th>Bank</th>
                             <th>Account No.</th>
-                            {/* <th>Created By</th> */}
                             <th>
                                 <FilterByShopUsers
                                     selectedShopUsers={selectedShopUsers}

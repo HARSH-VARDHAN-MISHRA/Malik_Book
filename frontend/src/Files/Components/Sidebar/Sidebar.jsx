@@ -5,7 +5,10 @@ import { Link } from "react-router-dom";
 import { BASE_URL } from "../../../api";
 import { UseScreenWidth } from "../Utils/UseScreenWidth";
 
-function Sidebar({ sidetoggle, onToggle }) {
+function Sidebar({ sidetoggle, onToggle, walletContent  }) {
+
+  const [showWallet, setShowWallet] = useState(false);
+
   const [dropdowns, setDropdowns] = useState([]);
 
   const userDetails = JSON.parse(localStorage.getItem("malik_book_user"));
@@ -60,6 +63,9 @@ function Sidebar({ sidetoggle, onToggle }) {
             </div>
           </div>
           <div className="left">
+
+
+          {walletContent}
 
 
             <div className="btn-group">
