@@ -26,8 +26,8 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
     const [searchquery, setSearchQuery] = useState("");
 
     const [transactionType, setTransactionType] = useState([
-        { value: "pay", label: "Pay" },
-        { value: "recieve", label: "Recieve" },
+        { value: "Pay", label: "Pay" },
+        { value: "Receive", label: "Receive" },
     ]);
 
     const [selectedTransactionType, setSelectedTransactionType] = useState();
@@ -396,13 +396,12 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
                         <tr>
                             <th>#</th>
                             <th>
-                                Date
-                                {/* <FilterDateRangeModal
+                                <FilterDateRangeModal
                                     title="Date"
                                     startDate={startDate}
                                     endDate={endDate}
                                     onDateChange={handleDateChange}
-                                /> */}
+                                />
                             </th>
                             <th>
                                 <FilterByCustomers

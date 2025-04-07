@@ -41,7 +41,7 @@ function AllRoutes() {
               <>
                 <Helmet>
                   {" "}
-                  <title>Login - Account Mangement</title>{" "}
+                  <title>Login - Malik Book</title>{" "}
                 </Helmet>
                 <Login />
               </>
@@ -60,7 +60,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet>
-                      <title>Dashboard - Account Mangement</title>{" "}
+                      <title>Dashboard - Malik Book</title>{" "}
                     </Helmet>
                     <Dashboard />
                   </>
@@ -72,7 +72,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet>
-                      <title>All Products - Account Mangement</title>{" "}
+                      <title>All Products - Malik Book</title>{" "}
                     </Helmet>
                     <AllProducts />
                   </>
@@ -84,7 +84,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet>
-                      <title>Add Product - Account Mangement</title>{" "}
+                      <title>Add Product - Malik Book</title>{" "}
                     </Helmet>
                     <AddProduct />
                   </>
@@ -98,7 +98,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet>
-                      <title>All Customers - Account Mangement</title>{" "}
+                      <title>All Customers - Malik Book</title>{" "}
                     </Helmet>
                     <AllCustomer />
                   </>
@@ -112,7 +112,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet>
-                      <title>Shop Detail - Account Mangement</title>{" "}
+                      <title>Shop Detail - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDetail setWalletContent={setWalletContent} />
                   </>
@@ -123,7 +123,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet> 
-                      <title>Shop Deposit & Withdraw History - Account Mangement</title>{" "}
+                      <title>Shop Deposit & Withdraw History - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDepositWithdrawHistory />
                   </>

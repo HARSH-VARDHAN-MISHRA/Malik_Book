@@ -69,7 +69,7 @@ function Login() {
             {/* {loading && "LOADING"} */}
             <div className="login-container">
                 <div className="login-box">
-                    <h1>Welcome to Malik CRM</h1>
+                    <h1>Welcome to Book</h1>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
