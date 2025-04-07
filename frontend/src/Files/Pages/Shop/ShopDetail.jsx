@@ -66,7 +66,7 @@ const ShopDetail = ({ setWalletContent }) => {
                                     }
                                 }}
                             ></i>{" "}
-                            <Link to={`/`}>Home</Link>
+                            <Link to={`/dashboard/`}>Home</Link>
                         </li>
                         <li className="breadcrumb-item active">
                             Shop Detail

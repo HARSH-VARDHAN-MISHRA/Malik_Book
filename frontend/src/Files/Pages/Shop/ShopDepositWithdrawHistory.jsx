@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { GET_DEPOSIT_AND_WITHDRAW_HISTORY } from '../../../api';
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import FilterByShopUsers from "../../Components/FilterModals/FilterByShopUsers";
+import FilterDateRangeModal from "../../Components/FilterModals/FilterDateRangeModal";
 
 const ShopDepositWithdrawHistory = () => {
     const { id } = useParams();
@@ -60,6 +61,11 @@ const ShopDepositWithdrawHistory = () => {
         fetchData(1, searchquery); // Fetch data for the first page with updated page size
     };
 
+    const handleDateChange = (start, end) => {
+        setStartDate(start);
+        setEndDate(end);
+    };
+
     // Fetch customers data based on pagination and search
     const fetchData = (page = currentPage, query = searchquery) => {
 
@@ -96,7 +102,7 @@ const ShopDepositWithdrawHistory = () => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, searchquery, selectedHistoryType, selectedShopUsers , id]);
+    }, [currentPage, pageSize, searchquery, selectedHistoryType, selectedShopUsers, startDate, endDate, id]);
 
 
     return (
@@ -152,7 +158,14 @@ const ShopDepositWithdrawHistory = () => {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Date</th>
+                            <th>
+                                <FilterDateRangeModal
+                                    title="Date"
+                                    startDate={startDate}
+                                    endDate={endDate}
+                                    onDateChange={handleDateChange}
+                                />
+                            </th>
                             <th>
                                 <FilterSelectionModal
                                     title="Type"

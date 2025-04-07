@@ -61,8 +61,8 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
     };
 
     const handleDateChange = (start, end) => {
-        setStartDate(start || "");
-        setEndDate(end || "");
+        setStartDate(start);
+        setEndDate(end);
     };
 
 
@@ -421,7 +421,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
                                             <hr />
                                         </div>
 
-                                        
+
 
                                         <div className="d-grid gap-2">
                                             <button className="btn btn-success" onClick={handleOpenDepositMoneyModal}>

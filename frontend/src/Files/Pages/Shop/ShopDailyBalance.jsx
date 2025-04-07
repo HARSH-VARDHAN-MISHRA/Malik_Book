@@ -39,7 +39,6 @@ const ShopDailyBalance = () => {
     const handleDateChange = (start, end) => {
         setStartDate(start || "");
         setEndDate(end || "");
-        fetchData(1);
     };
 
     const fetchData = (page = currentPage) => {
@@ -71,7 +70,7 @@ const ShopDailyBalance = () => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize , startDate, endDate]);
 
     const renderBankBalances = (balances) => (
         <ul className="list-unstyled mb-0">

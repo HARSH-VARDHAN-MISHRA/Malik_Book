@@ -62,22 +62,12 @@ function FilterDateRangeModal({ title, startDate, endDate, onDateChange }) {
         setIsOpen(false);
     };
 
-    // const handleClear = () => {
-    //     onDateChange(null, null);
-    //     setTempStartDate(null);
-    //     setTempEndDate(null);
-    //     setIsOpen(false);
-    // };
     const handleClear = () => {
-        const now = new Date();
-        const oneMonthAgo = subMonths(now, 1);
-    
-        onDateChange(null, null); // still tell parent that it's cleared
-        setTempStartDate(oneMonthAgo);
-        setTempEndDate(now);
+        onDateChange(null, null);
+        setTempStartDate(null);
+        setTempEndDate(null);
         setIsOpen(false);
     };
-    
 
     const handleToggleOpen = () => {
         setIsOpen(!isOpen);
