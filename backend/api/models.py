@@ -60,7 +60,7 @@ class BankAccount(models.Model):
     ifsc_code=models.CharField(max_length=100,null=True,blank=True)
     balance=models.FloatField(default=0.00)
     def __str__(self):
-        return f"{self.shop.name} => {self.account_name} => {self.account_number} "
+        return f"{self.shop.name} => {self.account_name} => {self.account_number} {(self.bank_name)}"
     
 class ShopCash(models.Model):
     shop=models.ForeignKey(Shop, on_delete=models.CASCADE)
@@ -134,14 +134,14 @@ class DailyClosingCashBalance(models.Model):
 class DailyOpeningBankBalance(models.Model):
     daily_balance=models.ForeignKey(DailyBalance,on_delete=models.CASCADE)
     bank_account=models.ForeignKey(BankAccount,on_delete=models.SET_NULL,null=True,blank=True)
-    amount=models.PositiveIntegerField()
+    amount=models.FloatField()
     def __str__(self):
         return f"{self.daily_balance.pk} => {self.bank_account.account_name} => {self.amount}"
     
 class DailyClosingBankBalance(models.Model):
     daily_balance=models.ForeignKey(DailyBalance,on_delete=models.CASCADE)
     bank_account= models.ForeignKey(BankAccount,on_delete=models.SET_NULL,null=True,blank=True)
-    amount=models.PositiveIntegerField()
+    amount=models.FloatField()
     def __str__(self):
         return f"{self.daily_balance.pk} => {self.bank_account.account_name} => {self.amount}"
     

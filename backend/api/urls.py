@@ -39,4 +39,7 @@ urlpatterns = [
     path('get-currencies/',shops.get_currencies),
     path('get-bank-accounts/',shops.get_bank_accounts),
     path('get-transaction-types/',shops.get_transaction_types),
+
+    # get daily balance
+    path('get-daily-balance/',shops.get_daily_balance),
 ]

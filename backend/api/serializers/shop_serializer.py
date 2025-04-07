@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Shop,BankAccount,ShopCash,Currency,Transaction,TransactionCashDenomination,TransactionPaymentDetail,TransactionType,Customer,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail
+from api.models import Shop,BankAccount,ShopCash,Currency,Transaction,TransactionCashDenomination,TransactionPaymentDetail,TransactionType,Customer,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,DailyBalance,DailyClosingBankBalance,DailyClosingCashBalance,DailyOpeningBankBalance,DailyOpeningCashBalance
 
 
 
@@ -109,3 +109,49 @@ class DepositAndWithdrawHistorySerializer(serializers.ModelSerializer):
             "name": obj.created_by.name,
             "email": obj.created_by.email
             } if obj.created_by else {}
+
+class OpeningBankBalanceSerializer(serializers.ModelSerializer):
+    bank_account=BankAccountSerializer(read_only=True)
+    class Meta:
+        model = DailyOpeningBankBalance
+        fields = ['id','bank_account','amount']
+class ClosingBankBalanceSerializer(serializers.ModelSerializer):
+    bank_account=BankAccountSerializer(read_only=True)
+    class Meta:
+        model = DailyClosingBankBalance
+        fields = ['id','bank_account','amount']
+
+class OpeningCashSerializer(serializers.ModelSerializer):
+    currency=serializers.SerializerMethodField()
+    class Meta:
+        model = DailyOpeningCashBalance
+        fields = ['id','currency','quantity']
+    def get_currency(self, obj):
+        return obj.currency.currency
+    
+class ClosingCashSerializer(serializers.ModelSerializer):
+    currency=serializers.SerializerMethodField()
+    class Meta:
+        model = DailyClosingCashBalance
+        fields = ['id','currency','quantity']
+    def get_currency(self, obj):
+        return obj.currency.currency
+
+
+class DailyBalanceSerializer(serializers.ModelSerializer):
+    opening_bank_balance=serializers.SerializerMethodField()
+    opening_cash_detail=serializers.SerializerMethodField()
+    closing_bank_balance=serializers.SerializerMethodField()
+    closing_cash_detail=serializers.SerializerMethodField()
+    class Meta:
+        model = DailyBalance
+        fields = ['id', 'date','opening_bank_balance','opening_cash_detail','closing_bank_balance','closing_cash_detail']
+    def get_opening_bank_balance(self, obj):
+        return OpeningBankBalanceSerializer(DailyOpeningBankBalance.objects.filter(daily_balance=obj),many=True).data
+    def get_opening_cash_detail(self, obj):
+        return OpeningCashSerializer(DailyOpeningCashBalance.objects.filter(daily_balance=obj),many=True).data
+    def get_closing_bank_balance(self, obj):
+        return ClosingBankBalanceSerializer(DailyClosingBankBalance.objects.filter(daily_balance=obj),many=True).data
+    def get_closing_cash_detail(self, obj):
+        return ClosingCashSerializer(DailyClosingCashBalance.objects.filter(daily_balance=obj),many=True).data
+    

@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .auth import token_validator
-from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,User
+from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,User , DailyBalance
+from django.utils import timezone
 from api.serializers import shop_serializer
 from django.db import transaction
 from django.db.models import Q
@@ -253,6 +254,7 @@ def receive_payment(request):
 def get_transactions(request):
     try:
         data=request.data
+        # print(data)
         search=data.get('search',None)
         page_number=data.get('page_number',1)
         page_size=data.get('page_size',25)
@@ -282,7 +284,7 @@ def get_transactions(request):
         if selected_customer_pks:
             all_transactions=all_transactions.filter(customer__pk__in=selected_customer_pks)
         if selected_transaction_type:
-            all_transactions=all_transactions.filter(transaction_type__transaction_type__icontains=selected_transaction_type)
+            all_transactions=all_transactions.filter(transaction_type__transaction_type__in=selected_transaction_type)
         if starting_date and ending_date:
             if starting_date == ending_date:
                 all_transactions=all_transactions.filter(date__icontains=starting_date)
@@ -301,6 +303,7 @@ def get_transactions(request):
 def get_deposit_and_withdraw_history(request):
     try:
         data=request.data
+        print(data)
         search=data.get('search',None)
         page_number=data.get('page_number',1)
         page_size=data.get('page_size',25)
@@ -327,10 +330,10 @@ def get_deposit_and_withdraw_history(request):
         ending=starting+page_size
 
         if selected_type:
-            all_history=all_history.filter(type__icontains=selected_type)
+            all_history=all_history.filter(type__in=selected_type)
         if starting_date and ending_date:
             if starting_date == ending_date:
-                all_history=all.filter(date__icontains=starting_date)
+                all_history=all_history.filter(date__icontains=starting_date)
             else:
                 all_history=all_history.filter(date__range=[starting_date,ending_date])
         if selected_user_pks:
@@ -529,5 +532,39 @@ def get_shop_users(request):
             return Response({"status":0,'message':"only admin can access this data"},status=status.HTTP_400_BAD_REQUEST)
         users=User.objects.filter(shop=current_shop).exclude(role="Admin")
         return Response({"status":1,'data':list(users.values())},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+@api_view(["POST"])
+@token_validator
+def get_daily_balance(request):
+    try:
+        data=request.data
+        page_number=data.get('page_number',1)
+        page_size=data.get('page_size',25)
+        shop_pk=data.get('shop_pk',0)
+        starting_date=data.get('starting_date',None)
+        ending_date=data.get('ending_date',None)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin":
+            if request.current_user.shop != current_shop:
+                return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        all_balance_history=DailyBalance.objects.filter(shop=current_shop).order_by('-id')
+        total_rows=all_balance_history.count()
+        total_pages=math.ceil(total_rows/page_size)
+        starting=(page_number-1)*page_size
+        ending=starting+page_size
+        if starting_date and ending_date:
+            if starting_date == ending_date:
+                all_balance_history=all_balance_history.filter(date__icontains=starting_date)
+            else:
+                all_balance_history=all_balance_history.filter(date__range=[starting_date,ending_date])
+        serialized_balance_history=shop_serializer.DailyBalanceSerializer(all_balance_history[starting:ending],many=True).data
+        return Response({"status":1,'data':serialized_balance_history,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)

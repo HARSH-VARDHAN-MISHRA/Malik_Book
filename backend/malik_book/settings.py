@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django_celery_beat'
 ]
 
 REST_FRAMEWORK = {
@@ -85,7 +86,7 @@ WSGI_APPLICATION = 'malik_book.wsgi.application'
 # }
 
 
-# local database
+# local harsh database
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -97,15 +98,15 @@ WSGI_APPLICATION = 'malik_book.wsgi.application'
 #     }
 # }
 
-# local database
+# local partsklik database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'malik_book',
-        'USER': 'malik',
-        'PASSWORD': 'Malik5676',
+        'USER': 'turbo',
+        'PASSWORD': 'tech@2024',
         'HOST': 'localhost',
-        'PORT': '3307',
+        'PORT': '3306',
     }
 }
 
@@ -122,6 +123,11 @@ DATABASES = {
 #     }
 # }
 
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'  # This is correct for the broker
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'  # This is correct for the result backend
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -146,6 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
+CELERY_ENABLE_UTC = False
 
 USE_I18N = True
 
