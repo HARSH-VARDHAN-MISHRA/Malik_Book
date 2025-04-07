@@ -52,43 +52,50 @@ const ShopDetail = ({ setWalletContent }) => {
         <>
             {loading && <Loader message={loadingMsg} />}
 
-        <div className="d-flex align-items-center justify-content-between gap-1">
-            <nav>
-                <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                        <i
-                            className="fa-solid fa-arrow-left"
-                            onClick={() => {
-                                if (window.history.length > 1) {
-                                    navigate(-1);
-                                } else {
-                                    navigate(`/dashboard/`);
-                                }
-                            }}
-                        ></i>{" "}
-                        <Link to={`/`}>Home</Link>
-                    </li>
-                    <li className="breadcrumb-item active">
-                        Shop Detail
-                    </li>
-                    <li className="breadcrumb-item active" aria-current="page">
-                        <strong>{shop?.name}</strong>
-                    </li>
-                </ol>
-            </nav>
-            <button className="btn btn-primary mb-2" 
-                onClick={() => navigate(`/shop-balance-history/${id}`)}
-            >
-                <i class="fa-solid fa-clock-rotate-left"></i> Balance History 
-            </button>
+            <div className="d-flex align-items-center justify-content-between gap-1">
+                <nav>
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item">
+                            <i
+                                className="fa-solid fa-arrow-left"
+                                onClick={() => {
+                                    if (window.history.length > 1) {
+                                        navigate(-1);
+                                    } else {
+                                        navigate(`/dashboard/`);
+                                    }
+                                }}
+                            ></i>{" "}
+                            <Link to={`/`}>Home</Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            Shop Detail
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                            <strong>{shop?.name}</strong>
+                        </li>
+                    </ol>
+                </nav>
+                {/* <button className="btn btn-primary mb-2"
+                    onClick={() => navigate(`/shop-balance-history/${id}`)}
+                >
+                    <i class="fa-solid fa-clock-rotate-left"></i> Balance History
+                </button> */}
 
-        </div>
+            </div>
 
 
             {/* Shop Details Section */}
             {shop && (
                 <section className="">
                     <div className="row">
+                        
+
+                        {shop && (
+                            <div className="col-md-9 mt-4 mt-md-0">
+                                <ShopTransations id={id} balance={shop.current_balance} fetchShopDetail={fetchData} setWalletContent={setWalletContent} />
+                            </div>
+                        )}
                         {/* Left Section: Shop Details */}
                         <div className="col-md-3">
                             <div className="card">
@@ -101,7 +108,7 @@ const ShopDetail = ({ setWalletContent }) => {
                                         <strong>Contact:</strong> {shop.contact_number || "N/A"}
                                     </p>
 
-                                    <div  style={{maxHeight:"67vh",overflow:"auto"}}>
+                                    <div style={{ maxHeight: "67vh", overflow: "auto" }}>
 
                                         {/* Bank Balances */}
                                         <h6 className="mt-2">Bank Balances:</h6>
@@ -180,12 +187,6 @@ const ShopDetail = ({ setWalletContent }) => {
                                 </div>
                             </div>
                         </div>
-
-                        {shop && (
-                            <div className="col-md-9 mt-4 mt-md-0">
-                                <ShopTransations id={id} balance={shop.current_balance} fetchShopDetail={fetchData} setWalletContent={setWalletContent} />
-                            </div>
-                        )}
                     </div>
                 </section>
             )}

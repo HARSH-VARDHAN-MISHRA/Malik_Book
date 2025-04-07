@@ -68,7 +68,7 @@ const Dashboard = () => {
       .then((response) => {
 
         if (response.data.status === 1) {
-          console.log(response.data);
+          // console.log(response.data);
           setShops(response.data.data);
         } else {
           toast.error(response.data?.message || "Something went wrong!");
@@ -88,11 +88,22 @@ const Dashboard = () => {
   const [openAddShopModal, setOpenAddShopModal] = useState(false);
 
 
+  const [openSections, setOpenSections] = useState({});
+
+  const toggleSection = (shopId, section) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [shopId]: {
+        ...prev[shopId],
+        [section]: !prev[shopId]?.[section],
+      },
+    }));
+  };
 
 
   return (
     <>
-      {shopLoading && <Loader /> }
+      {shopLoading && <Loader />}
       <AddShopModal
         open={openAddShopModal}
         handleClose={() => setOpenAddShopModal(false)}
@@ -145,14 +156,14 @@ const Dashboard = () => {
 
         {/* For ADMIN */}
         <div className="text-end mb-2">
-        {isAdmin && (
-          <button
-            className="btn btn-success"
-            onClick={() => setOpenAddShopModal(true)}
-          >
-            Create Shop
-          </button>
-        )}
+          {isAdmin && (
+            <button
+              className="btn btn-success"
+              onClick={() => setOpenAddShopModal(true)}
+            >
+              Create Shop
+            </button>
+          )}
         </div>
         <div className="row">
           {/* All Shops */}
@@ -168,10 +179,12 @@ const Dashboard = () => {
             ) : (
               <div className="row">
                 {shops.map((shop) => {
-                  // Calculate totals
                   const totalBank = shop.current_balance.bank_balance.reduce((sum, bank) => sum + bank.balance, 0);
                   const totalCash = shop.current_balance.cash.reduce((sum, cash) => sum + (cash.currency * cash.quantity), 0);
                   const grandTotal = totalBank + totalCash;
+
+                  const isBankOpen = openSections[shop.id]?.bank;
+                  const isCashOpen = openSections[shop.id]?.cash;
 
                   return (
                     <div className="col-md-4 mb-4" key={shop.id}>
@@ -184,48 +197,68 @@ const Dashboard = () => {
                           </p>
 
                           {/* Bank Balances */}
-                          <h6 className="mt-3">Bank Balances:</h6>
-                          {shop.current_balance.bank_balance.length > 0 ? (
-                            <>
-                              <ul className="list-group mb-2">
-                                {shop.current_balance.bank_balance.map((bank) => (
-                                  <li className="list-group-item d-flex justify-content-between" key={bank.id}>
-                                    <span>{bank.bank_name}</span>
-                                    <strong>₹{bank.balance.toLocaleString()}</strong>
+                          <div>
+                            <h6
+                              className="mt-3 d-flex justify-content-between align-items-center"
+                              role="button"
+                              onClick={() => toggleSection(shop.id, 'bank')}
+                            >
+                              <span>Bank Balances:</span>
+                              <span className="text-secondary small">
+                                ₹{totalBank.toLocaleString()}
+                              </span>
+                            </h6>
+
+                            {isBankOpen && (
+                              shop.current_balance.bank_balance.length > 0 ? (
+                                <ul className="list-group mb-2">
+                                  {shop.current_balance.bank_balance.map((bank) => (
+                                    <li className="list-group-item d-flex justify-content-between" key={bank.id}>
+                                      <span>{bank.bank_name}</span>
+                                      <strong>₹{bank.balance.toLocaleString()}</strong>
+                                    </li>
+                                  ))}
+                                  <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                    <span>Total Bank Balance:</span>
+                                    <span>₹{totalBank.toLocaleString()}</span>
                                   </li>
-                                ))}
-                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
-                                  <span>Total Bank Balance:</span>
-                                  <span>₹{totalBank.toLocaleString()}</span>
-                                </li>
-                              </ul>
-                              {/* <p className="fw-bold text-success">Total Bank Balance: ₹{totalBank.toLocaleString()}</p> */}
-                            </>
-                          ) : (
-                            <p className="text-muted">No bank balance available.</p>
-                          )}
+                                </ul>
+                              ) : (
+                                <p className="text-muted">No bank balance available.</p>
+                              )
+                            )}
+                          </div>
 
                           {/* Cash Balances */}
-                          <h6>Cash Balances:</h6>
-                          {shop.current_balance.cash.length > 0 ? (
-                            <>
-                              <ul className="list-group mb-2">
-                                {shop.current_balance.cash.map((cash) => (
-                                  <li className="list-group-item d-flex justify-content-between" key={cash.id}>
-                                    <span>₹{cash.currency} x {cash.quantity}</span>
-                                    <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
+                          <div>
+                            <h6
+                              className="d-flex justify-content-between align-items-center"
+                              role="button"
+                              onClick={() => toggleSection(shop.id, 'cash')}
+                            >
+                              <span>Cash Balances:</span>
+                              <span className="text-secondary small">₹{totalCash.toLocaleString()}</span>
+                            </h6>
+
+                            {isCashOpen && (
+                              shop.current_balance.cash.length > 0 ? (
+                                <ul className="list-group mb-2">
+                                  {shop.current_balance.cash.map((cash) => (
+                                    <li className="list-group-item d-flex justify-content-between" key={cash.id}>
+                                      <span>₹{cash.currency} x {cash.quantity}</span>
+                                      <strong>₹{(cash.currency * cash.quantity).toLocaleString()}</strong>
+                                    </li>
+                                  ))}
+                                  <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
+                                    <span>Total Cash Balance:</span>
+                                    <span>₹{totalCash.toLocaleString()}</span>
                                   </li>
-                                ))}
-                                <li className="list-group-item d-flex justify-content-between bg-light text-secondary fw-medium border-top">
-                                  <span>Total Cash Balance:</span>
-                                  <span>₹{totalCash.toLocaleString()}</span>
-                                </li>
-                              </ul>
-                              {/* <p className="fw-bold text-success">Total Cash Balance: ₹{totalCash.toLocaleString()}</p> */}
-                            </>
-                          ) : (
-                            <p className="text-muted">No cash available.</p>
-                          )}
+                                </ul>
+                              ) : (
+                                <p className="text-muted">No cash available.</p>
+                              )
+                            )}
+                          </div>
 
                           {/* Grand Total */}
                           <li className="d-flex justify-content-between fs-5 fw-medium my-1">
@@ -233,11 +266,9 @@ const Dashboard = () => {
                             <span className="text-danger">₹{grandTotal.toLocaleString()}</span>
                           </li>
 
-
-
                           {/* View Details Button */}
                           <button
-                            className="btn btn-primary w-100"
+                            className="btn btn-primary w-100 mt-2"
                             onClick={() => navigate(`/shop-details/${shop.id}`)}
                           >
                             <i className="fa-solid fa-arrow-right"></i> View Details
@@ -247,15 +278,15 @@ const Dashboard = () => {
                     </div>
                   );
                 })}
-
               </div>
+              // );
             )}
 
 
           </div>
         </div>
 
-       
+
 
         {/* Shop Transations for users */}
 

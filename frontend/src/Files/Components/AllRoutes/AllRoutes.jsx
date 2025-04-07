@@ -11,6 +11,7 @@ import AllCustomer from "../../Pages/Customer/AllCustomer";
 import ShopDetail from "../../Pages/Shop/ShopDetail";
 import { UseScreenWidth } from "../Utils/UseScreenWidth";
 import ShopDepositWithdrawHistory from "../../Pages/Shop/ShopDepositWithdrawHistory";
+import ShopDailyBalance from "../../Pages/Shop/ShopDailyBalance";
 
 function AllRoutes() {
   const isWideScreen = UseScreenWidth();
@@ -126,6 +127,17 @@ function AllRoutes() {
                       <title>Shop Deposit & Withdraw History - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDepositWithdrawHistory />
+                  </>
+                }
+              />
+              <Route
+                path="/shop-daily-balance/:id"
+                element={
+                  <>
+                    <Helmet> 
+                      <title>Shop Balance History - Malik Book</title>{" "}
+                    </Helmet>
+                    <ShopDailyBalance />
                   </>
                 }
               />

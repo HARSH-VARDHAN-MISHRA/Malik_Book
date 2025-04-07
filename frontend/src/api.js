@@ -1,9 +1,9 @@
 // Home
-// export const BASE_URL = 'http://192.168.1.61:8001';
+export const BASE_URL = 'http://192.168.1.61:8001';
 
 // Office
 // export const BASE_URL = 'http://192.168.1.38:8001';
-export const BASE_URL = 'http://192.168.1.30:8001';
+// export const BASE_URL = 'http://192.168.1.30:8001';
 
 export const PREFIX_URL = `${BASE_URL}/api`;
 
@@ -26,6 +26,7 @@ export const ADD_BANK_ACCOUNT = `${PREFIX_URL}/add-bank-account/`;
 
 export const DEPOSIT_BALANCE = `${PREFIX_URL}/deposit-balance/`;
 export const WITHDRAW_BALANCE = `${PREFIX_URL}/withdraw-balance/`;
+export const GET_DAILY_BALANCE = `${PREFIX_URL}/get-daily-balance/`;
 
 // Users
 export const ADD_USER = `${PREFIX_URL}/add-user/`;

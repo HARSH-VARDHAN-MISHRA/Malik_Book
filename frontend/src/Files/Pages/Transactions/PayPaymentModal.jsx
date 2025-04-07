@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import AsyncSelect from "react-select/async";
 import { GET_CUSTOMERS, MAKE_PAYMENT } from "../../../api";
+import AddCustomerModal from "../Customer/AddCustomerModal";
 
 const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, fetchData }) => {
     const userDetails = JSON.parse(localStorage.getItem("malik_book_user"));
@@ -141,185 +142,214 @@ const PayPaymentModal = ({ open, handleClose, shopPk, balance, fetchShopDetail, 
         }
     };
 
+    // Add Customer Modal
+    const [openAddCustomerModal, setOpenAddCustomerModal] = useState(false);
+    const handleOpenAddCustomerModal = () => {
+        setOpenAddCustomerModal(true);
+    };
+
+    const handleCloseAddCustomerModal = () => {
+        setOpenAddCustomerModal(false);
+    };
+
     return (
-        <Modal show={open} onHide={!loading ? handleClose : null} centered size="lg">
-            <Modal.Header closeButton={!loading}>
-                <Modal.Title>Make Payment</Modal.Title>
-            </Modal.Header>
 
-            <Form onSubmit={handleSubmit}>
-                <Modal.Body>
-                    {/* Select Customer */}
-                    <div className="mb-3">
-                        <label className="form-label">Select Customer</label>
-                        {/* <AsyncSelect
-                            cacheOptions
-                            loadOptions={loadCustomerOptions}
-                            defaultOptions
-                            onChange={setSelectedCustomer}
-                            value={selectedCustomer}
-                            isDisabled={loading}
-                            placeholder="Search customer..."
-                        /> */}
-                        <AsyncSelect
-                            cacheOptions
-                            loadOptions={loadCustomerOptions}
-                            defaultOptions
-                            onChange={setSelectedCustomer}
-                            value={selectedCustomer}
-                            isDisabled={loading}
-                            placeholder="Search customer..."
-                            formatOptionLabel={(option) => (
-                                <div>
-                                    <div className="fw-medium small">{option.name} ({option.phone})</div>
-                                    <div className="small ">
-                                        {option.address && (
-                                            <span>
-                                                {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
-                                            </span>
-                                        )}
-                                        <i className="fas fa-money-bill-wave me-1"></i>
-                                        Paid: ₹{option.total_paid_amount.toLocaleString()} |
-                                        Received: ₹{option.total_received_amount.toLocaleString()}
-                                    </div>
-                                </div>
-                            )}
-                        />
+        <>
 
-                    </div>
+            {openAddCustomerModal && (
+                <AddCustomerModal
+                    open={openAddCustomerModal}
+                    handleClose={handleCloseAddCustomerModal}
+                    setSelectedCustomer={setSelectedCustomer}
+                />
+            )}
+            <Modal show={open} onHide={!loading ? handleClose : null} centered size="lg">
+                <Modal.Header closeButton={!loading}>
+                    <Modal.Title>Make Payment</Modal.Title>
+                </Modal.Header>
 
-                    <div className="row">
-                        {/* Cash Section */}
-                        <div className="col-xl-6">
-                            <h6 className="mt-2">Cash Balances:</h6>
-                            {balance.cash.length > 0 ? (
-                                <ul className="list-group mb-3">
-                                    <div style={{ height: "40dvh", overflow: "auto" }}>
-                                        {balance.cash.map((cash) => {
-                                            const inputQty = Number(cashInputs[cash.id]) || 0;
-                                            const totalForThisCash = inputQty * cash.currency;
+                <Form onSubmit={handleSubmit}>
+                    <Modal.Body>
+                        {/* Select Customer */}
+                        <div className="row align-items-end">
+                            <div className="mb-2 col-md-9">
+                                <label className="form-label">Select Customer</label>
+                                <AsyncSelect
+                                    cacheOptions
+                                    loadOptions={loadCustomerOptions}
+                                    defaultOptions
+                                    onChange={setSelectedCustomer}
+                                    value={selectedCustomer}
+                                    isDisabled={loading}
+                                    placeholder="Search customer..."
+                                    formatOptionLabel={(option) => (
+                                        <div>
+                                            <div className="fw-medium small">{option.name} ({option.phone})</div>
+                                            <div className="small ">
+                                                {option.address && (
+                                                    <span>
+                                                        {option.address && <div> <i className="fas fa-map-marker-alt me-1"></i> {option.address}</div>}
+                                                    </span>
+                                                )}
+                                                <i className="fas fa-money-bill-wave me-1"></i>
+                                                Paid: ₹{option?.total_paid_amount?.toLocaleString()} |
+                                                Received: ₹{option?.total_received_amount?.toLocaleString()}
+                                            </div>
+                                        </div>
+                                    )}
+                                />
 
-                                            return (
-                                                <li
-                                                    className="list-group-item d-flex justify-content-between align-items-center"
-                                                    key={cash.id}
-                                                >
-                                                    <div className="w-75">
-                                                        ₹{cash.currency} x {cash.quantity}
-                                                        {inputQty > 0 && (
-                                                            <div className="text-success small">
-                                                                ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <Form.Control
-                                                        type="number"
-                                                        min="0"
-                                                        max={cash.quantity}
-                                                        placeholder="Qty"
-                                                        value={cashInputs[cash.id] ?? ""}
-                                                        onChange={(e) =>
-                                                            handleCashChange(cash.id, e.target.value, cash.quantity)
-                                                        }
-                                                        style={{ width: 100 }}
-                                                        disabled={loading}
-                                                    />
-                                                </li>
-                                            );
-                                        })}
-                                    </div>
-                                    <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
-                                        <span>Total Amount:</span>
-                                        <span>₹{totalCash.toLocaleString()}</span>
-                                    </li>
-                                </ul>
-                            ) : (
-                                <p className="text-muted">No cash available.</p>
-                            )}
+                            </div>
+                            <div className="mb-2 col-md-3">
+                                <button
+                                 type="button"
+                                     onClick={(e) => {
+                                        e.stopPropagation(); // Prevent the click event from bubbling up
+                                        handleOpenAddCustomerModal();
+                                    }}
+                                    className="btn btn-primary w-100"
+                                >
+                                    <i className="fa-solid fa-plus"></i> Add Customer
+                                </button>
+
+                            </div>
+
                         </div>
 
-                        {/* Bank Section */}
-                        <div className="col-xl-6">
-                            <h6 className="mt-2">Bank Accounts:</h6>
-                            <div style={{ height: "40dvh", overflow: "auto" }}>
-                                {balance.bank_balance.length > 0 ? (
-                                    <>
-                                        {balance.bank_balance
-                                            .filter((bank) => bank.balance > 0)
-                                            .map((bank) => (
-                                                <div className="card mb-3" key={bank.id}>
-                                                    <div className="card-body d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <h6 className="mb-1">{bank.bank_name}</h6>
-                                                            <p className="mb-0 small">Account No: {bank.account_number}</p>
-                                                            <p className="mb-0 small">IFSC: {bank.ifsc_code}</p>
-                                                            <p className="mb-0 small">Holder Name: {bank.account_name}</p>
-                                                            <strong>Available: ₹{bank.balance.toLocaleString()}</strong>
+                        <div className="row">
+                            {/* Cash Section */}
+                            <div className="col-xl-6">
+                                <h6 className="mt-2">Cash Balances:</h6>
+                                {balance.cash.length > 0 ? (
+                                    <ul className="list-group mb-3">
+                                        <div style={{ height: "40dvh", overflow: "auto" }}>
+                                            {balance.cash.map((cash) => {
+                                                const inputQty = Number(cashInputs[cash.id]) || 0;
+                                                const totalForThisCash = inputQty * cash.currency;
+
+                                                return (
+                                                    <li
+                                                        className="list-group-item d-flex justify-content-between align-items-center"
+                                                        key={cash.id}
+                                                    >
+                                                        <div className="w-75">
+                                                            ₹{cash.currency} x {cash.quantity}
+                                                            {inputQty > 0 && (
+                                                                <div className="text-success small">
+                                                                    ➤ ₹{cash.currency} x {inputQty} = ₹{totalForThisCash.toLocaleString()}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <Form.Control
                                                             type="number"
-                                                            className="ms-3"
-                                                            placeholder="Amount"
                                                             min="0"
-                                                            max={bank.balance}
-                                                            value={bankInputs[bank.id] ?? ""}
-                                                            onChange={(e) => handleBankInputChange(bank.id, e.target.value, bank.balance)}
-                                                            style={{ width: 120 }}
+                                                            max={cash.quantity}
+                                                            placeholder="Qty"
+                                                            value={cashInputs[cash.id] ?? ""}
+                                                            onChange={(e) =>
+                                                                handleCashChange(cash.id, e.target.value, cash.quantity)
+                                                            }
+                                                            style={{ width: 100 }}
                                                             disabled={loading}
                                                         />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                    </>
+                                                    </li>
+                                                );
+                                            })}
+                                        </div>
+                                        <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
+                                            <span>Total Amount:</span>
+                                            <span>₹{totalCash.toLocaleString()}</span>
+                                        </li>
+                                    </ul>
                                 ) : (
-                                    <p className="text-muted">No bank accounts available.</p>
+                                    <p className="text-muted">No cash available.</p>
                                 )}
+                            </div>
+
+                            {/* Bank Section */}
+                            <div className="col-xl-6">
+                                <h6 className="mt-2">Bank Accounts:</h6>
+                                <div style={{ height: "40dvh", overflow: "auto" }}>
+                                    {balance.bank_balance.length > 0 ? (
+                                        <>
+                                            {balance.bank_balance
+                                                .filter((bank) => bank.balance > 0)
+                                                .map((bank) => (
+                                                    <div className="card mb-3" key={bank.id}>
+                                                        <div className="card-body d-flex justify-content-between align-items-start">
+                                                            <div>
+                                                                <h6 className="mb-1">{bank.bank_name}</h6>
+                                                                <p className="mb-0 small">Account No: {bank.account_number}</p>
+                                                                <p className="mb-0 small">IFSC: {bank.ifsc_code}</p>
+                                                                <p className="mb-0 small">Holder Name: {bank.account_name}</p>
+                                                                <strong>Available: ₹{bank.balance.toLocaleString()}</strong>
+                                                            </div>
+                                                            <Form.Control
+                                                                type="number"
+                                                                className="ms-3"
+                                                                placeholder="Amount"
+                                                                min="0"
+                                                                max={bank.balance}
+                                                                value={bankInputs[bank.id] ?? ""}
+                                                                onChange={(e) => handleBankInputChange(bank.id, e.target.value, bank.balance)}
+                                                                style={{ width: 120 }}
+                                                                disabled={loading}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </>
+                                    ) : (
+                                        <p className="text-muted">No bank accounts available.</p>
+                                    )}
+
+                                </div>
+                                <ul className="list-group">
+                                    <li></li>
+                                    <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
+                                        <span>Total Amount:</span>
+                                        <span>₹{totalBank.toLocaleString()}</span>
+                                    </li>
+                                </ul>
 
                             </div>
-                            <ul className="list-group">
-                                <li></li>
-                                <li className="list-group-item d-flex justify-content-between text-secondary fw-medium bg-light">
-                                    <span>Total Amount:</span>
-                                    <span>₹{totalBank.toLocaleString()}</span>
-                                </li>
-                            </ul>
 
-                        </div>
-
-                        {/* Grand Total */}
-                        <div className="col-12 mt-1">
-                            <div className="d-flex justify-content-between border-top pt-1 fw-medium  fs-5">
-                                <span>Grand Total:</span>
-                                <span className="text-danger">₹{(totalCash + totalBank).toLocaleString()}</span>
+                            {/* Grand Total */}
+                            <div className="col-12 mt-1">
+                                <div className="d-flex justify-content-between border-top pt-1 fw-medium  fs-5">
+                                    <span>Grand Total:</span>
+                                    <span className="text-danger">₹{(totalCash + totalBank).toLocaleString()}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Remark */}
-                    <div className="mb-3">
-                        <label className="form-label">Remark</label>
-                        <textarea
-                            rows={2}
-                            value={remark}
-                            onChange={(e) => setRemark(e.target.value)}
-                            className="form-control"
-                            placeholder="Enter remark"
-                            disabled={loading}
-                        />
-                    </div>
+                        {/* Remark */}
+                        <div className="mb-3">
+                            <label className="form-label">Remark</label>
+                            <textarea
+                                rows={2}
+                                value={remark}
+                                onChange={(e) => setRemark(e.target.value)}
+                                className="form-control"
+                                placeholder="Enter remark"
+                                disabled={loading}
+                            />
+                        </div>
 
-                </Modal.Body>
+                    </Modal.Body>
 
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose} disabled={loading}>
-                        Cancel
-                    </Button>
-                    <Button type="submit" variant="success" disabled={loading}>
-                        {loading ? <Spinner animation="border" size="sm" /> : "Make Payment"}
-                    </Button>
-                </Modal.Footer>
-            </Form>
-        </Modal>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose} disabled={loading}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="success" disabled={loading}>
+                            {loading ? <Spinner animation="border" size="sm" /> : "Make Payment"}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+
+        </>
     );
 };
 

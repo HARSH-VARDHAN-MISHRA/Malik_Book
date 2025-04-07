@@ -53,6 +53,13 @@ function AddCustomerModal({ open, handleClose, setSelectedCustomer = () => { }, 
                 if (setSelectedCustomer) {
                     setSelectedCustomer(response.data.customer);
                 }
+                // console.log("response.data  :",response.data);
+                const newCustomer = response.data.data;
+                setSelectedCustomer({
+                    ...newCustomer,
+                    value: newCustomer.id,
+                    label: `${newCustomer.name} (${newCustomer.phone})`,
+                });
 
                 toast.success("Customer Added Successfully");
                 setCustomerDetails({

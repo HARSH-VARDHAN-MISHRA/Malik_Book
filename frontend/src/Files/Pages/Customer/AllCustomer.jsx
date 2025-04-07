@@ -278,11 +278,7 @@ const AllCustomer = () => {
                                 return (
                                     <tr key={customer.id}>
                                         <td>{customer.id}</td>
-                                        <td>
-                                            <Link to={`/customer-detail/${customer.id}`}>
-                                                {customer.name}
-                                            </Link>
-                                        </td>
+                                        <td>{customer.name}</td>
                                         <td>{customer.phone || "-"}</td>
                                         <td>{customer.email || "-"}</td>
                                         <td>{customer.address || "-"}</td>

@@ -65,7 +65,7 @@ function Sidebar({ sidetoggle, onToggle, walletContent  }) {
           <div className="left">
 
 
-          {walletContent}
+          {/* {walletContent} */}
 
 
             <div className="btn-group">
