@@ -81,17 +81,6 @@ function Sidebar({ sidetoggle, onToggle, walletContent  }) {
                 <span className="visually-hidden">Toggle Dropdown</span>
               </button>
               <ul className="dropdown-menu" style={{ maxWidth: '140px' }}>
-                {userDetails?.role == "Admin" && (
-                  <>
-                    <li
-                      className="dropdown-item border-bottom mb-2 pb-2"
-                      onClick={() => window.open(`${BASE_URL}/admin`, "_blank")}
-                    >
-                      <i className="fa-solid fa-lock"></i> Admin Panel
-                    </li>
-                  </>
-                )}
-
                 <li
                   className="dropdown-item text-danger "
                   onClick={handleLogout}

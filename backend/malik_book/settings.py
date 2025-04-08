@@ -36,7 +36,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  
     "http://localhost:3001",  
     "http://localhost:3002",  
-    'http://192.168.1.38:3002'
+    'http://192.168.1.38:3002',
+    'http://192.168.1.38:3001'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False  
@@ -87,28 +88,28 @@ WSGI_APPLICATION = 'malik_book.wsgi.application'
 
 
 # local harsh database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'malik_book',
-        'USER': 'malik',
-        'PASSWORD': 'Malik5676',
-        'HOST': 'localhost',
-        'PORT': '3307',
-    }
-}
-
-# local partsklik database
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'malik_book',
-#         'USER': 'turbo',
-#         'PASSWORD': 'tech@2024',
+#         'USER': 'malik',
+#         'PASSWORD': 'Malik5676',
 #         'HOST': 'localhost',
-#         'PORT': '3306',
+#         'PORT': '3307',
 #     }
 # }
+
+# local partsklik database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'malik_book',
+        'USER': 'turbo',
+        'PASSWORD': 'tech@2024',
+        'HOST': '192.168.1.30',
+        'PORT': '3306',
+    }
+}
 
 
 # live database 

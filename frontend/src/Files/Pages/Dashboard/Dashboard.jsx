@@ -204,8 +204,15 @@ const Dashboard = () => {
                               onClick={() => toggleSection(shop.id, 'bank')}
                             >
                               <span>Bank Balances:</span>
-                              <span className="text-secondary small">
+                              {/* <span className="text-secondary small">
                                 ₹{totalBank.toLocaleString()}
+                              </span> */}
+                              <span className="d-flex align-items-center gap-2 text-secondary small">
+                                ₹{totalBank?.toLocaleString()}
+                                <i
+                                  className={`fa-solid ${isBankOpen ? 'fa-chevron-up' : 'fa-chevron-down'
+                                    } transition-icon`}
+                                ></i>
                               </span>
                             </h6>
 
@@ -237,7 +244,14 @@ const Dashboard = () => {
                               onClick={() => toggleSection(shop.id, 'cash')}
                             >
                               <span>Cash Balances:</span>
-                              <span className="text-secondary small">₹{totalCash.toLocaleString()}</span>
+                              {/* <span className="text-secondary small">₹{totalCash.toLocaleString()}</span> */}
+                              <span className="d-flex align-items-center gap-2 text-secondary small">
+                                ₹{totalCash?.toLocaleString()}
+                                <i
+                                  className={`fa-solid ${isCashOpen ? 'fa-chevron-up' : 'fa-chevron-down'
+                                    } transition-icon`}
+                                ></i>
+                              </span>
                             </h6>
 
                             {isCashOpen && (
