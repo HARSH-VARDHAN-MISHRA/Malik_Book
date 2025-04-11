@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'django_celery_beat'
@@ -40,8 +41,36 @@ CORS_ALLOWED_ORIGINS = [
     'http://192.168.1.38:3001'
 ]
 
+
+
 CORS_ALLOW_ALL_ORIGINS = False  
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'Authorization',
+    'x-api-key',
+    'x-requested-with',
+    'accept',
+    'origin',
+    'user-agent',
+    'DNT',
+    'cache-control',
+    'x-csrftoken',
+    'x-xsrf-token',
+]
+
+
+CORS_ALLOW_METHODS = [
+    
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
 
 
 MIDDLEWARE = [
@@ -106,7 +135,7 @@ DATABASES = {
         'NAME': 'malik_book',
         'USER': 'turbo',
         'PASSWORD': 'tech@2024',
-        'HOST': '192.168.1.30',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }

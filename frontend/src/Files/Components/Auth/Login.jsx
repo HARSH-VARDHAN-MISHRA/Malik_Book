@@ -30,14 +30,14 @@ function Login() {
         e.preventDefault();
         setLoading(true);
 
-        const sendData = { email, password };
+        const sendData = { email:email?.toLowerCase(), password };
 
 
         try {
             // const response = await axios.post(LOGIN, sendData);
-            const response = await axios.post(LOGIN, sendData, { withCredentials: true });
+            const response = await axios.post(LOGIN, sendData);
 
-            console.log("Response:", response);
+            // console.log("Response:", response);
 
             if (response.data.status === 1) {
                 const userDetails = {
