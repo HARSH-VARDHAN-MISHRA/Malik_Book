@@ -32,6 +32,11 @@ function Sidebar({ sidetoggle, onToggle, walletContent  }) {
       path: "/all-customers/",
       icon: <i className="fa-solid fa-users"></i>,
     },
+    {
+      title: "Services",
+      path: "/services/",
+      icon: <i className="fa-solid fa-users"></i>,
+    },
   ];
 
   //Navbar

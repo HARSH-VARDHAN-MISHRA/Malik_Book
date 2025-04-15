@@ -57,3 +57,13 @@ export const GET_TRANSACTIONS = `${PREFIX_URL}/get-transactions/`;
 export const GET_DEPOSIT_AND_WITHDRAW_HISTORY = `${PREFIX_URL}/get-deposit-and-withdraw-history/`;
 
 
+
+// Services
+export const ADD_SERVICE_TYPE = `${PREFIX_URL}/add-service-type/`;
+export const UPDATE_SERVICE_TYPE = `${PREFIX_URL}/update-service-type/`;
+export const GET_SERVICE_TYPES = `${PREFIX_URL}/get-service-types/`;
+export const ADD_SERVICE = `${PREFIX_URL}/add-service/`;
+export const GET_SERVICES = `${PREFIX_URL}/get-services/`;
+
+
+

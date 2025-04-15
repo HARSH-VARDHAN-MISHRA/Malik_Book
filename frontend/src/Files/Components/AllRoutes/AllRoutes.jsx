@@ -12,6 +12,7 @@ import ShopDetail from "../../Pages/Shop/ShopDetail";
 import { UseScreenWidth } from "../Utils/UseScreenWidth";
 import ShopDepositWithdrawHistory from "../../Pages/Shop/ShopDepositWithdrawHistory";
 import ShopDailyBalance from "../../Pages/Shop/ShopDailyBalance";
+import Services from "../../Pages/Services/Services";
 
 function AllRoutes() {
   const isWideScreen = UseScreenWidth();
@@ -138,6 +139,20 @@ function AllRoutes() {
                       <title>Shop Balance History - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDailyBalance />
+                  </>
+                }
+              />
+
+
+
+              <Route
+                path="/services/"
+                element={
+                  <>
+                    <Helmet> 
+                      <title>Shop Balance History - Malik Book</title>{" "}
+                    </Helmet>
+                    <Services />
                   </>
                 }
               />
