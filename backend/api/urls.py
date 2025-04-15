@@ -42,4 +42,14 @@ urlpatterns = [
 
     # get daily balance
     path('get-daily-balance/',shops.get_daily_balance),
+
+    path('add-service-type/',shops.add_service_type),
+    path('get-service-types/',shops.get_service_types),
+    path('update-service-type/',shops.update_service_type),
+
+    path('add-service/',shops.add_service),
+    path('get-services/',shops.get_services),
+
+
+
 ]

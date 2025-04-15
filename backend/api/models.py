@@ -173,4 +173,36 @@ class DepositWithdrawHistoryPaymentDetail(models.Model):
         return f"{self.deposit_withdraw_history.pk} => {self.bank_account.account_name} => {self.amount}"
     
 
+class ServiceType(models.Model):
+    service_type=models.CharField(max_length=255,unique=True)
+    def __str__(self):
+        return str(self.service_type)
+    
+class Service(models.Model):
+    shop=models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,blank=True)
+    service_type=models.ForeignKey(ServiceType,on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE)
+    note=models.TextField(null=True,blank=True)
+    created_by=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"{self.customer.name} => {self.service_type.service_type}"
+    
+class ServiceCashDinomination(models.Model):
+    service=models.ForeignKey(Service,on_delete=models.CASCADE)
+    currency=models.ForeignKey(Currency,on_delete=models.SET_NULL,null=True,blank=True)
+    quantity=models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.service.pk} => {self.currency} x {self.quantity}"
+
+class ServicePayment(models.Model):
+    service=models.ForeignKey(Service,on_delete=models.CASCADE)
+    bank_account=models.ForeignKey(BankAccount,on_delete=models.SET_NULL,null=True,blank=True)
+    amount=models.PositiveIntegerField()
+    def __str__(self):
+        return f"{self.service.pk} => {self.bank_account.account_name if self.bank_account else "Unknown aacount"} => {self.amount}"
+    
+
 

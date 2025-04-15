@@ -2,12 +2,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .auth import token_validator
-from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,User , DailyBalance
+from api.models import Shop,Transaction,Currency,BankAccount,TransactionType,Customer,ShopCash,TransactionCashDenomination,TransactionPaymentDetail,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,User , DailyBalance,ServiceType,Service,ServicePayment,ServiceCashDinomination
 from django.utils import timezone
 from api.serializers import shop_serializer
 from django.db import transaction
 from django.db.models import Q
+from django.forms import model_to_dict
 import math
+
 
 @api_view(["GET"])
 @token_validator
@@ -566,5 +568,166 @@ def get_daily_balance(request):
                 all_balance_history=all_balance_history.filter(date__range=[starting_date,ending_date])
         serialized_balance_history=shop_serializer.DailyBalanceSerializer(all_balance_history[starting:ending],many=True).data
         return Response({"status":1,'data':serialized_balance_history,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+@api_view(["POST"])
+@token_validator
+def add_service_type(request):
+    try:
+        data=request.data
+        service_type=data.get('service_type',None)
+        if not service_type:
+            return Response({"status":0,'message':"service_type is required"},status=status.HTTP_400_BAD_REQUEST)
+        if ServiceType.objects.filter(service_type__iexact=service_type).exists():
+            return Response({"status":0,'message':"service_type already exists"},status=status.HTTP_400_BAD_REQUEST)
+        new_service_type=ServiceType(service_type=service_type)
+        new_service_type.save()
+        return Response({"status":1,'message':"service_type added successfully","service_type":model_to_dict(new_service_type)},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@token_validator
+def get_service_types(request):
+    try:
+        all_service_types=list(ServiceType.objects.all().values())
+        return Response({"status":1,'data':all_service_types},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@token_validator
+def update_service_type(request):
+    try:
+        data=request.data
+        service_type_pk=data.get('service_type_pk',0)
+        service_type=data.get('service_type',None)
+        if not service_type:
+            return Response({"status":0,'message':"service_type is required"},status=status.HTTP_400_BAD_REQUEST)
+        current_service_type=ServiceType.objects.filter(pk=service_type_pk).first()
+        if not current_service_type:
+            return Response({"status":0,'message':"invalid service_type_pk"},status=status.HTTP_400_BAD_REQUEST)
+        if ServiceType.objects.filter(service_type__iexact=service_type).exclude(pk=service_type_pk).exists():
+            return Response({"status":0,'message':"service_type already exists"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            current_service_type.service_type=service_type
+            current_service_type.save()
+        return Response({"status":1,'message':"service_type updated successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@token_validator
+def add_service(request):
+    try:
+        data=request.data
+        shop_pk=data.get('shop_pk',0)
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            return Response({"status":0,'message':"invalid shop_pk"},status=status.HTTP_400_BAD_REQUEST)
+        service_type_pk=data.get('service_type_pk',0)
+        customer_pk=data.get('customer_pk',0)
+        note=data.get('note','')
+        cash_denomination=data.get('cash_denomination',[])
+        payment_details=data.get('payment_details',[])
+        if not cash_denomination and not payment_details:
+            return Response({"status":0,'message':"cash_denomination or payment_details is required"},status=status.HTTP_400_BAD_REQUEST)
+        if str(request.current_user.role).strip().lower()!="admin":
+            if request.current_user.shop != current_shop:
+                return Response({"status":0,'message':"You can not access this shop"},status=status.HTTP_400_BAD_REQUEST)
+        current_service_type=ServiceType.objects.filter(pk=service_type_pk).first()
+        if not current_service_type:
+            return Response({"status":0,'message':"invalid service_type_pk"},status=status.HTTP_400_BAD_REQUEST)
+        current_customer=Customer.objects.filter(pk=customer_pk).first()
+        if not current_customer:
+            return Response({"status":0,'message':"invalid customer_pk"},status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            service=Service(shop=current_shop,service_type=current_service_type,note=note,customer=current_customer,created_by=request.current_user)
+            service.save()
+            if cash_denomination:
+                for cash in cash_denomination:
+                    cash_pk=cash.get('cash_pk',0)
+                    quantity=cash.get('quantity',0)
+                    if quantity<=0:
+                        raise Exception("quantity should be greater than 0 in cash_denomination")
+                    current_cash_object=ShopCash.objects.filter(pk=cash_pk).first()
+                    if not current_cash_object:
+                        raise Exception(f"invalid cash_pk =>  {cash_pk}  in cash_denomination")
+                    cash_denomination_object=ServiceCashDinomination(
+                        service=service,
+                        currency=current_cash_object.currency,
+                        quantity=quantity
+                    )
+                    cash_denomination_object.save()
+                    current_cash_object.quantity+=quantity
+                    current_cash_object.save()
+            if payment_details:
+                for payment in payment_details:
+                    bank_account_pk=payment.get('bank_account_pk',0)
+                    amount=payment.get('amount',0)
+                    if amount<=0:
+                        raise Exception("amount should be greater than 0 in payment_details")
+                    current_bank_account=BankAccount.objects.filter(pk=bank_account_pk).first()
+                    if not current_bank_account:
+                        raise Exception( f"invalid bank_account_pk =>  {bank_account_pk}  in payment_details")
+                    if current_bank_account.shop != current_shop:
+                        raise Exception(f"bank_account_pk =>  {bank_account_pk} does not belong to this shop")
+                    payment_detail_object=ServicePayment(
+                        service=service,
+                        bank_account=current_bank_account,
+                        amount=amount
+                        )
+                    payment_detail_object.save()
+                    current_bank_account.balance+=amount
+                    current_bank_account.save()
+        return Response({"status":1,'message':"service added successfully"},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@token_validator
+def get_services(request):
+    try:
+        data=request.data
+        page_number=data.get('page_number',1)
+        page_size=data.get('page_size',25)
+        shop_pk=data.get('shop_pk',0)
+        search=data.get('search',None)
+        selected_customer_pks=data.get('selected_customer_pks',[])
+        selected_service_type_pks=data.get('selected_service_type_pks',[])
+        starting_date=data.get('starting_date',None)
+        ending_date=data.get('ending_date',None)
+        selected_user_pks=data.get('selected_user_pks',[])
+        current_shop=Shop.objects.filter(pk=shop_pk).first()
+        if not current_shop:
+            raise Exception(f"invalid shop_pk =>  {shop_pk}  in get_services")
+        services=Service.objects.filter(shop=current_shop)
+        if search:
+            services=services.filter(note__icontains=search)
+        if selected_customer_pks:
+            services=services.filter(customer__pk__in=selected_customer_pks)
+        if selected_service_type_pks:
+            services=services.filter(service_type__pk__in=selected_service_type_pks)
+        if selected_user_pks:
+            services=services.filter(created_by__pk__in=selected_user_pks)
+        if starting_date and ending_date:
+            if starting_date == ending_date:
+                services=services.filter(created_at__icontains=starting_date)
+            else:
+                services=services.filter(created_at__range=[starting_date,ending_date])
+        total_rows=services.count()
+        total_pages=math.ceil(total_rows/page_size)
+        starting=(page_number-1)*page_size
+        ending=starting+page_size
+        serialized_serivces=shop_serializer.ServiceSerializer(services[starting:ending],many=True).data
+        return Response({"status":1,'data':serialized_serivces,"total_pages":total_pages,"total_rows":total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Shop,BankAccount,ShopCash,Currency,Transaction,TransactionCashDenomination,TransactionPaymentDetail,TransactionType,Customer,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,DailyBalance,DailyClosingBankBalance,DailyClosingCashBalance,DailyOpeningBankBalance,DailyOpeningCashBalance
+from api.models import Shop,BankAccount,ShopCash,Currency,Transaction,TransactionCashDenomination,TransactionPaymentDetail,TransactionType,Customer,DepositWithdrawHistory,DepositWithdrawHistoryCashDenomination,DepositWithdrawHistoryPaymentDetail,DailyBalance,DailyClosingBankBalance,DailyClosingCashBalance,DailyOpeningBankBalance,DailyOpeningCashBalance,ServiceType,ServicePayment,ServiceCashDinomination,Service
 
 
 
@@ -55,6 +55,12 @@ class TransactionPaymentDetailSerializer(serializers.ModelSerializer):
     bank_account=BankAccountSerializer(read_only=True)
     class Meta:
         model = TransactionPaymentDetail
+        fields = ['id', 'bank_account', 'amount']
+
+class ServicePaymentSerializer(serializers.ModelSerializer):
+    bank_account= BankAccountSerializer(read_only=True)
+    class Meta:
+        model = ServicePayment
         fields = ['id', 'bank_account', 'amount']
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -154,4 +160,30 @@ class DailyBalanceSerializer(serializers.ModelSerializer):
         return ClosingBankBalanceSerializer(DailyClosingBankBalance.objects.filter(daily_balance=obj),many=True).data
     def get_closing_cash_detail(self, obj):
         return ClosingCashSerializer(DailyClosingCashBalance.objects.filter(daily_balance=obj),many=True).data
-    
+
+class ServiceSerializer(serializers.ModelSerializer):
+    shop=ShopMinimalSerializer()
+    service_type=serializers.SerializerMethodField()
+    customer=CustomerMinimalSeralizer()
+    created_by=serializers.SerializerMethodField()
+    cash_denomination=serializers.SerializerMethodField()
+    payment_detail=serializers.SerializerMethodField()
+    class Meta:
+        model = Service
+        fields = ['id','shop','service_type','customer','note','created_by','created_at','cash_denomination','payment_detail']
+    def get_service_type(self, obj):
+        return {
+            "id":obj.service_type.pk,
+            "service_type":obj.service_type.service_type
+        } if obj.service_type else {}
+    def get_created_by(self, obj):
+        return {
+            "id": obj.created_by.pk,
+            "name": obj.created_by.name,
+            "email": obj.created_by.email
+        } if obj.created_by else {}
+    def get_cash_denomination(self, obj):
+        return Service.objects.filter(service=obj).values('currency__currency','quantity')
+    def get_payment_detail(self, obj):
+        service_payment_details=ServicePayment.objects.filter(service=obj)
+        return ServicePaymentSerializer(service_payment_details, many=True).data

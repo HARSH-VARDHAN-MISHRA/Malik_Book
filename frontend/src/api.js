@@ -2,11 +2,11 @@
 // export const BASE_URL = 'http://192.168.1.61:8001';
 
 // Office
-// export const BASE_URL = 'http://192.168.1.25:8001';
+export const BASE_URL = 'http://192.168.1.25:8001';
 // export const BASE_URL = 'http://192.168.1.30:8001';
 
 // live server 
-export const BASE_URL = 'https://server.faizone.in';
+// export const BASE_URL = 'https://server.faizone.in';
 
 export const PREFIX_URL = `${BASE_URL}/api`;
 
