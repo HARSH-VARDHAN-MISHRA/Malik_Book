@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { DELETE_CUSTOMER, GET_CUSTOMERS, GET_SERVICES, GET_SHOP_DETAIL } from '../../../api';
+import { DELETE_CUSTOMER, GET_ALL_SHOPS, GET_CUSTOMERS, GET_SERVICES, GET_SHOP_DETAIL } from '../../../api';
 import { Modal, Button } from "react-bootstrap";
 import toast from "react-hot-toast";
 import Loader from '../../Components/Loader/Loader';
@@ -11,6 +11,7 @@ import FilterDateRangeModal from "../../Components/FilterModals/FilterDateRangeM
 import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import AddServiceModal from "./AddServiceModal";
+import AddCustomerServiceModal from "./AddCustomerServiceModal";
 
 const Services = () => {
 
@@ -29,9 +30,16 @@ const Services = () => {
     const [shop, setShop] = useState();
     const [selectedShop, setSelectedShop] = useState(1);
 
+    const [shops, setShops] = useState([]);
+    const [shopLoading, setShopLoading] = useState(false);
+
     useEffect(() => {
         if (userDetails) {
-            setSelectedShop(userDetails?.shop_pk);
+            if (userDetails.role?.toLowerCase() === "admin") {
+                getAllShops()
+            } else {
+                setSelectedShop(userDetails?.shop_pk);
+            }
         }
     }, []);
 
@@ -75,6 +83,37 @@ const Services = () => {
             });
     };
 
+    const getAllShops = () => {
+        setShopLoading(true);
+
+        const headers = {
+            Authorization: `${userDetails.token}`,
+        };
+
+
+        axios.get(GET_ALL_SHOPS, { headers })
+            .then((response) => {
+
+                if (response.data.status === 1) {
+                    const shopList = response.data.data;
+                    setShops(shopList);
+
+                    // Automatically set the first shop for admin
+                    if (shopList.length > 0) {
+                        setSelectedShop(shopList[0].id);
+                    }
+                } else {
+                    toast.error(response.data?.message || "Something went wrong!");
+                }
+            })
+            .catch((error) => {
+                console.error("Error while fetching shops:", error);
+                toast.error(error?.response?.data?.message || "Something went wrong!");
+            })
+            .finally(() => {
+                setShopLoading(false);
+            });
+    };
 
 
     // date Filter
@@ -154,7 +193,7 @@ const Services = () => {
         fetchData();
     }, [currentPage, pageSize, searchquery, startDate, endDate, selectedCustomers, selectedShopUsers]);
 
-    // Add Customer Modal
+    // Add Service Modal
     const [openAddServiceModal, setOpenAddServiceModal] = useState(false);
     const handleOpenAddServiceModal = () => {
         setOpenAddServiceModal(true);
@@ -164,12 +203,15 @@ const Services = () => {
         setOpenAddServiceModal(false);
     };
 
+    const [openCustomerServiceModal, setOpenCustomerServiceModal] = useState(false);
+
+// console.log("shop: ",shop);
     return (
         <>
             {loading && <Loader message={loadingMsg} />}
 
 
-            
+
             {openAddServiceModal && (
                 <AddServiceModal
                     open={openAddServiceModal}
@@ -178,26 +220,56 @@ const Services = () => {
                 />
             )}
 
-            <nav>
-                <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                        <i
-                            className="fa-solid fa-arrow-left"
-                            onClick={() => {
-                                if (window.history.length > 1) {
-                                    navigate(-1);
-                                } else {
-                                    navigate(`/dashboard/`);
-                                }
-                            }}
-                        ></i>{" "}
-                        <Link to={`/dashboard/`}>Home</Link>
-                    </li>
-                    <li className="breadcrumb-item active" aria-current="page">
-                        Services
-                    </li>
-                </ol>
-            </nav>
+
+            {openCustomerServiceModal && (
+                <AddCustomerServiceModal
+                    open={openCustomerServiceModal}
+                    handleClose={()=> {setOpenCustomerServiceModal(false)}}
+                    shopPk={selectedShop}
+                    balance={shop.current_balance}
+                    fetchData={fetchData}
+                />
+            )}
+
+
+            <div className="d-flex align-items-center justify-content-between gap-1 flex-wrap mb-2">
+                <nav>
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item">
+                            <i
+                                className="fa-solid fa-arrow-left"
+                                onClick={() => {
+                                    if (window.history.length > 1) {
+                                        navigate(-1);
+                                    } else {
+                                        navigate(`/dashboard/`);
+                                    }
+                                }}
+                            ></i>{" "}
+                            <Link to={`/dashboard/`}>Home</Link>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                            Services
+                        </li>
+                    </ol>
+                </nav>
+                {userDetails?.role?.toLowerCase() === 'admin' && (
+                    <div className="form-group">
+                        <select
+                            className="form-control"
+                            value={selectedShop || ""}
+                            onChange={(e) => setSelectedShop(e.target.value)}
+                        >
+                            {shops.map((shop) => (
+                                <option key={shop.id} value={shop.id}>
+                                    {shop.name} - {shop.address}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+            </div>
 
 
             <div className="top-content mb-2">
@@ -219,10 +291,16 @@ const Services = () => {
                     <div className="col-xl-8 ">
                         <div className="top-content-btns mt-1 mt-md-0">
                             <button
-                                onClick={() => handleOpenAddServiceModal()}
+                                onClick={() => setOpenCustomerServiceModal(true)}
                                 className="btn btn-primary add-btn"
                             >
                                 <i className="fa-solid fa-plus"></i> Add Service
+                            </button>
+                            <button
+                                onClick={() => handleOpenAddServiceModal()}
+                                className="btn btn-primary add-btn"
+                            >
+                                <i className="fa-solid fa-plus"></i> Add Service Type
                             </button>
                         </div>
                     </div>

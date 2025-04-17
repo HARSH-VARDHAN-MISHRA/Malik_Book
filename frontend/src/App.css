@@ -161,3 +161,9 @@ strong {
 .table {
     margin-bottom: 0rem;
 }
+
+.dimmed {
+    background-color: rgba(0, 0, 0, 0.397);
+    pointer-events: none;
+    /* Disables interactions */
+}

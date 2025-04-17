@@ -202,7 +202,7 @@ class ServicePayment(models.Model):
     bank_account=models.ForeignKey(BankAccount,on_delete=models.SET_NULL,null=True,blank=True)
     amount=models.PositiveIntegerField()
     def __str__(self):
-        return f"{self.service.pk} => {self.bank_account.account_name if self.bank_account else "Unknown aacount"} => {self.amount}"
-    
+        return f"{self.service.pk} => {self.bank_account.account_name if self.bank_account else 'Unknown account'} => {self.amount}"
+
 
 
