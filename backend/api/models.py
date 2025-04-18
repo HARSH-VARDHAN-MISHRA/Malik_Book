@@ -88,7 +88,7 @@ class TransactionType(models.Model):
 class Transaction(models.Model):
     date=models.DateField(auto_now_add=True)
     customer=models.ForeignKey(Customer,on_delete=models.CASCADE)
-    shop=models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,blank=True)
+    shop=models.ForeignKey(Shop,on_delete=models.CASCADE,null=True,blank=True)
     transaction_type=models.ForeignKey(TransactionType,on_delete=models.SET_NULL,null=True,blank=True)
     created_by=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
