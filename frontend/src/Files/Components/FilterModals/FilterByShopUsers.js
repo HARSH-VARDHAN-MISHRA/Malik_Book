@@ -25,8 +25,31 @@ function FilterByShopUsers({ selectedShopUsers, onSelect, id }) {
             .get(GET_SHOP_USERS, { params, headers })
             .then((res) => {
                 if (res.data.status === 1) {
-                    setUsers(res.data.data);
-                    setFilteredUsers(res.data.data);
+
+
+                    let usersList = res.data.data;
+
+                    // Check if the current user is already in the list
+                    const isCurrentUserInList = usersList.some(
+                        (user) => user.id === userDetails.id
+                    );
+
+                    if (!isCurrentUserInList) {
+                        usersList = [
+                            {
+                                id: userDetails.id,
+                                name: userDetails.name,
+                            },
+                            ...usersList,
+                        ];
+                    }
+
+                    setUsers(usersList);
+                    setFilteredUsers(usersList);
+
+                    // console.log(res.data.data)
+                    // setUsers(res.data.data);
+                    // setFilteredUsers(res.data.data);
                 } else {
                     toast.error(res.data.message || "Failed to fetch users");
                 }

@@ -34,7 +34,7 @@ const AddCustomerServiceModal = ({ open, handleClose, shopPk, balance, fetchData
             const response = await axios.get(GET_SERVICE_TYPES, { headers });
 
             if (response.data.status === 1) {
-                console.log(response.data.data);
+                // console.log(response.data.data);
                 setServiceTypes(response.data.data);
             } else {
                 toast.error(response.data.message || "Failed to fetch Service Types");
@@ -293,6 +293,11 @@ const AddCustomerServiceModal = ({ open, handleClose, shopPk, balance, fetchData
 
 
                         <div className="row">
+
+                            <div className="col-xl-12">
+                                <h5 className="text-center text-secondary">Add Service Charge</h5>
+                            </div>
+
                             {/* Cash Section */}
                             <div className="col-xl-6">
                                 <h6 className="mt-2">Cash Balances:</h6>

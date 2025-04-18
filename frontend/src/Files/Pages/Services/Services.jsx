@@ -12,6 +12,7 @@ import FilterByCustomers from "../../Components/FilterModals/FilterByCustomers";
 import FilterSelectionModal from "../../Components/FilterModals/FilterSelectionModal";
 import AddServiceModal from "./AddServiceModal";
 import AddCustomerServiceModal from "./AddCustomerServiceModal";
+import FilterByServiceType from "../../Components/FilterModals/FilterByServiceType";
 
 const Services = () => {
 
@@ -131,6 +132,15 @@ const Services = () => {
     const handleCustomerSelection = (selectedIds) => {
         setSelectedCustomers(selectedIds);
     };
+
+    // Service Type Filter
+    const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
+
+    const handleServiceTypeSelection = (selectedIds) => {
+        setSelectedServiceTypes(selectedIds);
+    };
+
+
     // Shop User Filter
     const [selectedShopUsers, setSelectedShopUsers] = useState([]);
 
@@ -162,7 +172,7 @@ const Services = () => {
             page_number: page,
             page_size: pageSize,
             selected_customer_pks: selectedCustomers || [],
-            selected_service_type_pks: [],
+            selected_service_type_pks: selectedServiceTypes || [],
             selected_user_pks: selectedShopUsers || [],
             starting_date: startDate || "",
             ending_date: endDate || "",
@@ -191,7 +201,7 @@ const Services = () => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedCustomers, selectedShopUsers]);
+    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedCustomers, selectedShopUsers, selectedServiceTypes]);
 
     // Add Service Modal
     const [openAddServiceModal, setOpenAddServiceModal] = useState(false);
@@ -205,7 +215,7 @@ const Services = () => {
 
     const [openCustomerServiceModal, setOpenCustomerServiceModal] = useState(false);
 
-// console.log("shop: ",shop);
+    // console.log("shop: ",shop);
     return (
         <>
             {loading && <Loader message={loadingMsg} />}
@@ -224,7 +234,7 @@ const Services = () => {
             {openCustomerServiceModal && (
                 <AddCustomerServiceModal
                     open={openCustomerServiceModal}
-                    handleClose={()=> {setOpenCustomerServiceModal(false)}}
+                    handleClose={() => { setOpenCustomerServiceModal(false) }}
                     shopPk={selectedShop}
                     balance={shop.current_balance}
                     fetchData={fetchData}
@@ -296,12 +306,7 @@ const Services = () => {
                             >
                                 <i className="fa-solid fa-plus"></i> Add Service
                             </button>
-                            <button
-                                onClick={() => handleOpenAddServiceModal()}
-                                className="btn btn-primary add-btn"
-                            >
-                                <i className="fa-solid fa-plus"></i> Add Service Type
-                            </button>
+                            
                         </div>
                     </div>
                 </div>
@@ -327,13 +332,22 @@ const Services = () => {
                                 />
                             </th>
                             <th>
+                                <FilterByServiceType
+                                    selectedServiceTypes={selectedServiceTypes}
+                                    onSelect={handleServiceTypeSelection}
+                                />
+                            </th>
+                            <th>
                                 <FilterByShopUsers
                                     selectedShopUsers={selectedShopUsers}
                                     onSelect={handleShopUsersSelection}
-                                // id={id}
+                                    id={selectedShop}
                                 />
                             </th>
-                            <th>Remark</th>
+                            <th>Cash Denomination</th>
+                            <th>Bank Details</th>
+                            <th>Total (Cash + Bank)</th>
+                            <th>Note</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -344,36 +358,85 @@ const Services = () => {
                                 </td>
                             </tr>
                         ) : (
-                            services.map((data, index) => {
-                                return (
-                                    <tr key={data.id}>
-                                        <td>{data.id}</td>
-                                        <td className="text-nowrap">
-                                            {new Date(data.date).toLocaleString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                            })}
+                            services.map((data, index) => (
+                                <tr key={data.id}>
+                                    <td>{data.id}</td>
+                                    <td className="text-nowrap">
+                                        {new Date(data.created_at).toLocaleString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </td>
+                                    <td>
+                                        <strong>{data.customer?.name || "-"}</strong>
+                                        <br />
+                                        {data.customer?.phone || "-"}
+                                    </td>
+                                    <td>{data?.service_type?.service_type || "-"}</td>
+                                    <td>{data?.created_by?.name || "-"}</td>
+                                    <td>
+                                        {data.cash_denomination?.length > 0 ? (
+                                            <>
+                                                <ul className="mb-0 ps-0">
+                                                    {data.cash_denomination.map((cd, idx) => (
+                                                        <li key={idx}>
+                                                            ₹{cd.currency__currency} x {cd.quantity} = ₹{cd.currency__currency * cd.quantity}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <h6 className="fw-medium text-success mt-1 ">
+                                                    Total: ₹{data.cash_denomination.reduce(
+                                                        (acc, cd) => acc + cd.currency__currency * cd.quantity,
+                                                        0
+                                                    )}
+                                                </h6>
+                                            </>
+                                        ) : (
+                                            "-"
+                                        )}
+                                    </td>
 
-                                        </td>
-                                        <td>
-                                            <strong>{data.customer?.name || "-"}</strong>
-                                            <br />
-                                            {data.customer?.phone}
-                                        </td>
+                                    <td>
+                                        {data.payment_detail?.length > 0 ? (
+                                            <>
+                                                <ul className="mb-0 ps-0">
+                                                    {data.payment_detail.map((pd, idx) => (
+                                                        <li key={idx}>
+                                                            ₹{pd.amount} - <strong>{pd.bank_account.bank_name}</strong> ({pd.bank_account.account_name})
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <h6 className="fw-medium text-success mt-1">
+                                                    Total: ₹{data.payment_detail.reduce((acc, pd) => acc + pd.amount, 0)}
+                                                </h6>
+                                            </>
+                                        ) : (
+                                            "-"
+                                        )}
+                                    </td>
+
+                                    <td className="fw-bold text-center">
+                                        <h6>₹
+                                            {
+                                                (data.cash_denomination?.reduce(
+                                                    (acc, cd) => acc + cd.currency__currency * cd.quantity,
+                                                    0
+                                                ) || 0) +
+                                                (data.payment_detail?.reduce((acc, pd) => acc + pd.amount, 0) || 0)
+                                            }</h6>
+                                    </td>
 
 
-                                        <td className="text-nowrap">
-                                            {data?.created_by?.name}
-                                        </td>
-                                        <td>{data.remark || "-"}</td>
-
-                                    </tr>
-                                );
-                            })
+                                    <td>{data.note || "-"}</td>
+                                </tr>
+                            ))
                         )}
                     </tbody>
                 </table>
+
 
             </section>
 
