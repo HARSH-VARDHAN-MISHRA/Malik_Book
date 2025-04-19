@@ -17,7 +17,7 @@ const ShopDailyBalance = () => {
     const [pageSize, setPageSize] = useState(25);
     const [totalPages, setTotalPages] = useState(0);
     const [totalRows, setTotalRows] = useState(0);
-
+    const [shopObj, setShopObj] = useState(null)
     const [balances, setBalances] = useState([]);
     const userDetails = JSON.parse(localStorage.getItem("malik_book_user"));
 
@@ -58,6 +58,8 @@ const ShopDailyBalance = () => {
         axios
             .post(GET_DAILY_BALANCE, data, { headers })
             .then((response) => {
+                // console.log(response.data);
+                setShopObj(response.data.shop_obj);
                 setBalances(response.data.data || []);
                 setTotalPages(response.data.total_pages);
                 setTotalRows(response.data.total_rows);
@@ -415,6 +417,11 @@ const ShopDailyBalance = () => {
                     <li className="breadcrumb-item active" aria-current="page">
                         Shop Balance Detail
                     </li>
+                    {shopObj?.name && (
+                        <li className="breadcrumb-item active" aria-current="page">
+                            {shopObj?.name}
+                        </li>
+                    )}
                 </ol>
             </nav>
 
@@ -465,7 +472,7 @@ const ShopDailyBalance = () => {
                                                 className="btn btn-primary ms-2"
                                                 onClick={() => handleViewTypeModal(balance, 'opening_bank')}
                                             >
-                                               <i class="fa-solid fa-eye"></i>
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </td>
                                         <td>
@@ -474,7 +481,7 @@ const ShopDailyBalance = () => {
                                                 className="btn btn-secondary ms-2"
                                                 onClick={() => handleViewTypeModal(balance, 'opening_cash')}
                                             >
-                                               <i class="fa-solid fa-eye"></i>
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </td>
                                         <td>
@@ -483,7 +490,7 @@ const ShopDailyBalance = () => {
                                                 className="btn btn-primary ms-2"
                                                 onClick={() => handleViewTypeModal(balance, 'closing_bank')}
                                             >
-                                               <i class="fa-solid fa-eye"></i>
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </td>
                                         <td>
@@ -492,7 +499,7 @@ const ShopDailyBalance = () => {
                                                 className="btn btn-secondary ms-2"
                                                 onClick={() => handleViewTypeModal(balance, 'closing_cash')}
                                             >
-                                               <i class="fa-solid fa-eye"></i>
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </td>
 
