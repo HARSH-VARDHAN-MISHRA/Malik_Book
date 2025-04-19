@@ -199,6 +199,22 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
 
 
 
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
+
+    const handleOpenDetailModal = (txn) => {
+        setSelectedTransaction(txn);
+        setShowDetailModal(true);
+    };
+
+    const handleCloseDetailModal = () => {
+        setShowDetailModal(false);
+        setSelectedTransaction(null);
+    };
+
+
+
+
 
     // useEffect(() => {
     //     const walletUI = (
@@ -456,7 +472,6 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
                 </div>
             </div>
 
-
             <section className="main-table">
                 <table className="table table-bordered">
                     <thead>
@@ -524,9 +539,6 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric',
-                                                // hour: 'numeric',
-                                                // minute: '2-digit',
-                                                // hour12: true,
                                             })}
 
                                         </td>
