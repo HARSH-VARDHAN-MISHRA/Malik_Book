@@ -29,7 +29,7 @@ const Services = () => {
 
 
     const [shop, setShop] = useState();
-    const [selectedShop, setSelectedShop] = useState(1);
+    const [selectedShop, setSelectedShop] = useState(null);
 
     const [shops, setShops] = useState([]);
     const [shopLoading, setShopLoading] = useState(false);
@@ -165,9 +165,13 @@ const Services = () => {
     };
 
     const fetchData = (page = currentPage, query = searchquery) => {
+
+        if(!selectedShop){
+            return
+        }
         setLoadingMsg("Fetching Services from Database!")
         const data = {
-            shop_pk: selectedShop || 1,
+            shop_pk: selectedShop,
             search: query,
             page_number: page,
             page_size: pageSize,
@@ -201,7 +205,7 @@ const Services = () => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedCustomers, selectedShopUsers, selectedServiceTypes]);
+    }, [currentPage, pageSize, searchquery, startDate, endDate, selectedCustomers, selectedShopUsers, selectedServiceTypes , selectedShop]);
 
     // Add Service Modal
     const [openAddServiceModal, setOpenAddServiceModal] = useState(false);
