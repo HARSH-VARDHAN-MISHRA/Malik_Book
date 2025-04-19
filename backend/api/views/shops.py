@@ -567,7 +567,7 @@ def get_daily_balance(request):
             else:
                 all_balance_history=all_balance_history.filter(date__range=[starting_date,ending_date])
         serialized_balance_history=shop_serializer.DailyBalanceSerializer(all_balance_history[starting:ending],many=True).data
-        return Response({"status":1,'data':serialized_balance_history,'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
+        return Response({"status":1,'data':serialized_balance_history,"shop_obj":model_to_dict(current_shop),'total_pages':total_pages,'page_number':page_number,'total_rows':total_rows},status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)
     
@@ -730,4 +730,5 @@ def get_services(request):
         serialized_serivces=shop_serializer.ServiceSerializer(services[starting:ending],many=True).data
         return Response({"status":1,'data':serialized_serivces,"total_pages":total_pages,"total_rows":total_rows},status=status.HTTP_200_OK)
     except Exception as e:
+        print(e,' is exception')
         return Response({"status":0,'message':str(e)},status=status.HTTP_400_BAD_REQUEST)

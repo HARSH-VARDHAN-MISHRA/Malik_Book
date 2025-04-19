@@ -36,7 +36,7 @@ class ShopSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'address', 'contact_number', 'current_balance']
 
     def get_current_balance(self, obj):
-        cash_details = ShopCash.objects.filter(shop=obj)
+        cash_details = ShopCash.objects.filter(shop=obj).order_by('-currency__id')
         bank_details = BankAccount.objects.filter(shop=obj)
 
         return {
@@ -183,7 +183,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "email": obj.created_by.email
         } if obj.created_by else {}
     def get_cash_denomination(self, obj):
-        return Service.objects.filter(service=obj).values('currency__currency','quantity')
+        return ServiceCashDinomination.objects.filter(service=obj).values('currency__currency','quantity')
     def get_payment_detail(self, obj):
         service_payment_details=ServicePayment.objects.filter(service=obj)
         return ServicePaymentSerializer(service_payment_details, many=True).data
