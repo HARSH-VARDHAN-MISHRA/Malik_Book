@@ -15,6 +15,8 @@ import DepositMoney from "../Transactions/DepositMoney";
 import WithdrawMoney from "../Transactions/WithdrawMoney";
 import FilterByShopUsers from "../../Components/FilterModals/FilterByShopUsers";
 import { useNavigate } from "react-router-dom";
+import { Modal, Button } from 'react-bootstrap';
+
 
 const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => {
 
@@ -216,6 +218,7 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
 
 
 
+
     // useEffect(() => {
     //     const walletUI = (
     //         <div className="wallet-container px-2" style={{ position: "relative", zIndex: 10 }}>
@@ -287,6 +290,56 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
     return (
         <>
             {loading && <Loader />}
+
+            <Modal
+                show={showDetailModal}
+                onHide={handleCloseDetailModal}
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Transaction Details</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <h6><strong>Cash Denominations</strong></h6>
+                    {selectedTransaction?.cash_denomination?.length > 0 ? (
+                        <ul className="list-group mb-3">
+                            {selectedTransaction.cash_denomination.map((item, idx) => (
+                                <li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+                                    ₹ {item.currency__currency} × {item.quantity}
+                                    <span>₹ {item.currency__currency * item.quantity}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No cash denomination data.</p>
+                    )}
+
+                    <h6><strong>Bank Payments</strong></h6>
+                    {selectedTransaction?.payment_detail?.length > 0 ? (
+                        <ul className="list-group">
+                            {selectedTransaction.payment_detail.map((item, idx) => (
+                                <li key={idx} className="list-group-item">
+                                    <strong>Bank:</strong> {item.bank_account.bank_name} <br />
+                                    <strong>Account:</strong> {item.bank_account.account_name} - {item.bank_account.account_number} <br />
+                                    <strong>IFSC:</strong> {item.bank_account.ifsc_code} <br />
+                                    <strong>Amount:</strong> ₹ {item.amount}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No bank payment data.</p>
+                    )}
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDetailModal}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
 
             {openMakePaymentModal && (
                 <PayPaymentModal
@@ -553,8 +606,35 @@ const ShopTransations = ({ id, balance, fetchShopDetail, setWalletContent }) => 
                                             </span>
                                         </td>
 
-                                        <td className="text-nowrap">{totalCash ? `₹ ${totalCash}` : '-'}</td>
-                                        <td className="text-nowrap">{totalBank ? `₹ ${totalBank}` : '-'}</td>
+                                        <td className="text-nowrap">
+                                            <span className="d-flex align-items-center justify-content-between">
+                                                {totalCash ? `₹ ${totalCash}` : '-'}
+                                                {txn.cash_denomination.length > 0 && (
+                                                    <button
+                                                        className="btn btn-sm btn-light rounded ms-2"
+                                                        onClick={() => handleOpenDetailModal(txn)}
+                                                        title="View Cash Details"
+                                                    >
+                                                        <i className="fa fa-eye"></i>
+                                                    </button>
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className="text-nowrap">
+                                        <span className="d-flex align-items-center justify-content-between">
+                                            {totalBank ? `₹ ${totalBank}` : '-'}
+                                            {txn.payment_detail.length > 0 && (
+                                                <button
+                                                    className="btn btn-sm btn-light rounded ms-2"
+                                                    onClick={() => handleOpenDetailModal(txn)}
+                                                    title="View Bank Details"
+                                                >
+                                                    <i className="fa fa-eye"></i>
+                                                </button>
+                                            )}
+                                            </span>
+                                        </td>
+
                                         <td className="text-nowrap">
                                             {txn?.created_by?.name}
                                         </td>
