@@ -709,7 +709,7 @@ def get_services(request):
         current_shop=Shop.objects.filter(pk=shop_pk).first()
         if not current_shop:
             raise Exception(f"invalid shop_pk =>  {shop_pk}  in get_services")
-        services=Service.objects.filter(shop=current_shop)
+        services=Service.objects.filter(shop=current_shop).order_by('-id')
         if search:
             services=services.filter(note__icontains=search)
         if selected_customer_pks:

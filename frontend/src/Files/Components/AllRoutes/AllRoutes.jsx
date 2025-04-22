@@ -69,7 +69,7 @@ function AllRoutes() {
                 }
               />
 
-              <Route
+              {/* <Route
                 path="/all-products"
                 element={
                   <>
@@ -79,9 +79,9 @@ function AllRoutes() {
                     <AllProducts />
                   </>
                 }
-              />
+              /> */}
 
-              <Route
+              {/* <Route
                 path="/add-product"
                 element={
                   <>
@@ -91,7 +91,7 @@ function AllRoutes() {
                     <AddProduct />
                   </>
                 }
-              />
+              /> */}
 
 
               {/* ===== Customers ====  */}
@@ -125,7 +125,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet> 
-                      <title>Shop Deposit & Withdraw History - Malik Book</title>{" "}
+                      <title> Deposit & Withdraw History - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDepositWithdrawHistory />
                   </>
@@ -136,7 +136,7 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet> 
-                      <title>Shop Balance History - Malik Book</title>{" "}
+                      <title> Balance History - Malik Book</title>{" "}
                     </Helmet>
                     <ShopDailyBalance />
                   </>
@@ -150,7 +150,8 @@ function AllRoutes() {
                 element={
                   <>
                     <Helmet> 
-                      <title>Shop Balance History - Malik Book</title>{" "}
+                      {/* <title>Shop Balance History - Malik Book</title>{" "} */}
+                      <title>Service History - Malik Book</title>{" "}
                     </Helmet>
                     <Services />
                   </>

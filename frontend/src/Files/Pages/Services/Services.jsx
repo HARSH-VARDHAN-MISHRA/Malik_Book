@@ -98,12 +98,16 @@ const Services = () => {
                 if (response.data.status === 1) {
                     const shopList = response.data.data;
                     setShops(shopList);
-
+                    console.log(shopList)
                     // Automatically set the first shop for admin
                     if (shopList.length > 0) {
                         setSelectedShop(shopList[0].id);
+                    }else{
+                        setLoading(false);
+                        setLoadingMsg("No shop found.");
                     }
                 } else {
+                     setLoading(false);
                     toast.error(response.data?.message || "Something went wrong!");
                 }
             })
@@ -358,7 +362,7 @@ const Services = () => {
                         {services.length === 0 ? (
                             <tr>
                                 <td colSpan="8" className="text-center">
-                                    No transactions found.
+                                    No history found.
                                 </td>
                             </tr>
                         ) : (

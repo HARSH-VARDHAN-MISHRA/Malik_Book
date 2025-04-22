@@ -10,7 +10,6 @@ def token_validator(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):    
         try:
-
             token = request.headers.get('Authorization', None)
             if not token:
                 token = request.COOKIES.get('token', None)

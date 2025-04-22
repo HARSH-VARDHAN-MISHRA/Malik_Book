@@ -1,5 +1,5 @@
 // Home
-// export const BASE_URL = 'http://192.168.1.61:8001';
+// export const BASE_URL = 'http://172.20.10.3:8001';
 
 // Office
 // export const BASE_URL = 'http://192.168.1.25:8001';
